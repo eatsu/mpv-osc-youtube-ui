@@ -1,38 +1,32 @@
-# mpv-osc-modern
-VER 1.1.2
+# mpv-osc-youtube-ui
 
-changelog:
-1. add thumbnails in timeline integration (when [thumbfast](https://github.com/po5/thumbfast) is installed).
+This is a fork of [mpv-osc-modern](https://github.com/maoiscat/mpv-osc-modern).
+Differences from upstream are:
 
-VER 1.1.1
+- YouTube-like asymmetric UI
+- more compact
 
-changelog:
-1. fix logo distortion issue due to recent libass update.
+![preview](preview.png)
 
-VER 1.1.0
+## Installation
 
-changelog:
-1. Gui activation area is limited to gui area.
-2. Time slider show chapter name in tooltip.
-3. Volume slider show volume number in tooltip.
-4. Volume slider use processed volume number to make loudness transition fluent.
-5. Mouse wheel up/down over volume slider to change volume.
+1. Install `youtube-ui.lua` into `~/.config/mpv/scripts`:
 
-------
-
-Yet another mpv osc script, based on mpv built-in osc
-
-![img](https://github.com/maoiscat/mpv-osc-modern/blob/main/preview.png)
-
-# Installation
-
-modern.lua --> "\~\~/scripts/" (!!REMOVE OTHER OSC SCRIPTS!!)
-
-material-design-iconic-font.ttf --> "\~\~/fonts" ([FONT LINK](https://zavoloklom.github.io/material-design-iconic-font/))
-
-Then edit "\~\~/mpv.conf", add the following lines to the end
-
+```sh
+mkdir -p ~/.config/mpv/scripts
+wget -P ~/.config/mpv/scripts https://github.com/eatsu/mpv-osc-youtube-ui/raw/main/youtube-ui.lua
 ```
+
+2. Install `Material-Design-Iconic-Font.ttf` into `~/.local/share/fonts`:
+
+```sh
+mkdir -p ~/.local/share/fonts
+wget -P ~/.local/share/fonts https://github.com/eatsu/mpv-osc-youtube-ui/raw/main/Material-Design-Iconic-Font.ttf
+```
+
+3. Add the following lines to the end of `~/.config/mpv/mpv.conf`:
+
+```conf
 osc=no
 
 [Idle]
@@ -42,54 +36,9 @@ title=' '
 keepaspect=no
 background=1
 ```
-# Configuration
 
-Config file locates at "\~\~/script-opts/osc.conf". Supported options are listed below.
+4. (optional) Install `thumbfast.lua` from [thumbfast](https://github.com/po5/thumbfast) into `~/.config/mpv/scripts`:
 
+```sh
+wget -P ~/.config/mpv/scripts https://github.com/po5/thumbfast/raw/master/thumbfast.lua
 ```
-    showwindowed=yes/no             -- show OSC when windowed?
-    showfullscreen=yes/no           -- show OSC when fullscreen?
-    scalewindowed=1                 -- scaling of the controller when windowed
-    scalefullscreen=1               -- scaling of the controller when fullscreen
-    scaleforcedwindow=2             -- scaling when rendered on a forced window
-    vidscale=yes/no                 -- scale the controller with the video?
-    hidetimeout=1000                -- duration in ms until the OSC hides if no mouse movement. enforced non-negative for the user but internally negative is 'always-on'.
-    fadeduration=500                -- duration of fade out in ms 0=no fade
-    minmousemove=3                  -- minimum amount of pixels the mouse has to move between ticks to make the OSC show up
-    iamaprogrammer=yes/no           -- use native mpv values and disable OSC internal track list management (and some functions that depend on it)
-    font='mpv-osd-symbols'          -- default osc font
-    seekrange=yes/no                -- show seekrange overlay
-    seekrangealpha=128              -- transparency of seekranges
-    seekbarkeyframes=yes/no         -- use keyframes when dragging the seekbar
-    title='${media-title}'          -- string compatible with property-expansion to be shown as OSC title
-    showtitle=yes/no                -- show title and no hide timeout on pause
-    timetotal=yes/no                -- display total time instead of remaining time?
-    visibility=auto/yes/no          -- only used at init to set visibility_mode(...)
-    windowcontrols=auto/yes/no      -- whether to show window controls
-    volumecontrol=yes/no            -- whether to show mute button and volumne slider
-    processvolume=yes/no            -- volume bar show processd volume
-    language=eng/chs                -- eng=English chs=Chinese
-```
-
-# Thumbnails
-
-To enable thumbnails in timeline, install [thumbfast](https://github.com/po5/thumbfast). No other step necessary.
-
-# Button Actions
-
-Some buttons may accept multiple mouse actions, here is a list:
-
-(NOTE: mbtn = mouse button)
-
-## seekbar
-* mbtn_left: seek to chosen position.
-* mbtn_right: seek to the head of chosen chapter
-## skip_back/forward
-* mbtn_left: skip 5 seconds.
-* mbtn_right: skip 60 seconds.
-## playlist_back/forwad
-* mbtn_left: play previous/netx file.
-* mbtn_right: show playlist.
-## cycle_audio/subtitle
-* mbtn_left/right: cycle to next/previous track.
-* mbtn_mid: show track list.
