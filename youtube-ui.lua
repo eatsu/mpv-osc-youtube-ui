@@ -1284,12 +1284,12 @@ function osc_init()
     ne.content = '\xEF\x8E\xA0'
     ne.eventresponder['mbtn_left_down'] =
         --function () mp.command('seek -5') end
-        function () mp.commandv('seek', -5, 'relative', 'keyframes') end
+        function () mp.commandv('seek', -5, 'exact') end
     ne.eventresponder['shift+mbtn_left_down'] =
         function () mp.commandv('frame-back-step') end
     ne.eventresponder['mbtn_right_down'] =
         --function () mp.command('seek -60') end
-        function () mp.commandv('seek', -60, 'relative', 'keyframes') end
+        function () mp.commandv('seek', -60, 'exact') end
 
     --skipfrwd
     ne = new_element('skipfrwd', 'button')
@@ -1298,12 +1298,12 @@ function osc_init()
     ne.content = '\xEF\x8E\x9F'
     ne.eventresponder['mbtn_left_down'] =
         --function () mp.command('seek +5') end
-        function () mp.commandv('seek', 5, 'relative', 'keyframes') end
+        function () mp.commandv('seek', 5, 'exact') end
     ne.eventresponder['shift+mbtn_left_down'] =
         function () mp.commandv('frame-step') end
     ne.eventresponder['mbtn_right_down'] =
         --function () mp.command('seek +60') end
-        function () mp.commandv('seek', 60, 'relative', 'keyframes') end
+        function () mp.commandv('seek', 60, 'exact') end
 
     --
     update_tracklist()
