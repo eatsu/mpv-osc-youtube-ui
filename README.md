@@ -6,7 +6,7 @@ Differences from upstream are:
 - YouTube-like asymmetric UI
 - more compact
 
-![preview](preview.png)
+![preview](preview.png?raw=true)
 
 ## Installation
 
