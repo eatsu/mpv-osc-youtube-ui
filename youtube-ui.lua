@@ -90,7 +90,7 @@ local osc_param = { -- calculated by osc_init()
 }
 
 local osc_styles = {
-    TransBg = '{\\blur100\\bord140\\1c&H000000&\\3c&H000000&}',
+    TransBg = '{\\blur100\\bord100\\1c&H000000&\\3c&H000000&}',
     SeekbarBg = '{\\blur0\\bord0\\1c&HFFFFFF&}',
     SeekbarFg = '{\\blur1\\bord1\\1c&HE39C42&}',
     VolumebarBg = '{\\blur0\\bord0\\1c&H999999&}',
@@ -98,9 +98,9 @@ local osc_styles = {
     Ctrl1 = '{\\blur0\\bord0\\1c&HFFFFFF&\\3c&HFFFFFF&\\fs36\\fnmaterial-design-iconic-font}',
     Ctrl2 = '{\\blur0\\bord0\\1c&HFFFFFF&\\3c&HFFFFFF&\\fs24\\fnmaterial-design-iconic-font}',
     Ctrl3 = '{\\blur0\\bord0\\1c&HFFFFFF&\\3c&HFFFFFF&\\fs24\\fnmaterial-design-iconic-font}',
-    Time = '{\\blur0\\bord0\\1c&HFFFFFF&\\3c&H000000&\\fs17\\fn' .. user_opts.font .. '}',
+    Time = '{\\blur0\\bord0\\1c&HFFFFFF&\\3c&H000000&\\fs18\\fn' .. user_opts.font .. '}',
     Tooltip = '{\\blur1\\bord0.5\\1c&HFFFFFF&\\3c&H000000&\\fs18\\fn' .. user_opts.font .. '}',
-    Title = '{\\blur1\\bord0.5\\1c&HFFFFFF&\\3c&H0\\fs48\\q2\\fn' .. user_opts.font .. '}',
+    Title = '{\\blur1\\bord0.5\\1c&HFFFFFF&\\3c&H0\\fs32\\q2\\fn' .. user_opts.font .. '}',
     WinCtrl = '{\\blur1\\bord0.5\\1c&HFFFFFF&\\3c&H0\\fs20\\fnmpv-osd-symbols}',
     elementDown = '{\\1c&H999999&}',
 }
@@ -588,7 +588,7 @@ function render_elements(master_ass)
 
         local elem_ass = assdraw.ass_new()
         elem_ass:merge(style_ass)
-        
+
         if not (element.type == 'button') then
             elem_ass:merge(element.static_ass)
         end
@@ -604,7 +604,7 @@ function render_elements(master_ass)
             local seekRanges
             local rh = elem_geo.h / 2 -- Handle radius
             local xp
-            
+
             if pos then
                 xp = get_slider_ele_pos_for(element, pos)
                 ass_draw_cir_cw(elem_ass, xp, elem_geo.h/2, rh)
@@ -625,7 +625,7 @@ function render_elements(master_ass)
             end
 
             elem_ass:draw_stop()
-            
+
             -- add tooltip
             if not (element.slider.tooltipF == nil) then
                 if mouse_hit(element) then
@@ -710,7 +710,7 @@ function render_elements(master_ass)
             elseif not (element.content == nil) then
                 buttontext = element.content -- text objects
             end
-            
+
             buttontext = buttontext:gsub(':%((.?.?.?)%) unknown ', ':%(%1%)')  --gsub('%) unknown %(\'', '')
 
             local maxchars = element.layout.button.maxchars
@@ -728,7 +728,7 @@ function render_elements(master_ass)
             end
 
             elem_ass:append(buttontext)
-            
+
             -- add tooltip
             if not (element.tooltipF == nil) and element.enabled then
                 if mouse_hit(element) then
@@ -736,7 +736,7 @@ function render_elements(master_ass)
                     local an = 1
                     local ty = element.hitbox.y1
                     local tx = get_virt_mouse_pos()
-                    
+
                     if ty < osc_param.playresy / 2 then
                         ty = element.hitbox.y2
                         an = 7
@@ -998,7 +998,7 @@ function window_controls()
     lo.geometry = first_geo
     lo.style = osc_styles.WinCtrl
     lo.alpha[3] = 0
-    
+
     -- Maximize: ?? /??
     ne = new_element('maximize', 'button')
     if state.maximized or state.fullscreen then
@@ -1046,7 +1046,7 @@ layouts = function ()
     -- area for show/hide
     add_area('showhide', 0, osc_param.playresy-200, osc_param.playresx, osc_param.playresy)
     add_area('showhide_wc', osc_param.playresx*0.67, 0, osc_param.playresx, 48)
-    
+
     -- fetch values
     local osc_w, osc_h=
         osc_geo.w, osc_geo.h
@@ -1062,27 +1062,27 @@ layouts = function ()
     lo.style = osc_styles.TransBg
     lo.layer = 10
     lo.alpha[3] = 0
-    
+
     --
     -- Alignment
     --
     local refX = osc_w / 2
     local refY = posY
     local geo
-    
+
     --
     -- Seekbar
     --
     new_element('seekbarbg', 'box')
     lo = add_layout('seekbarbg')
-    lo.geometry = {x = refX , y = refY - 96 , an = 5, w = osc_geo.w - 50, h = 2}
+    lo.geometry = {x = refX , y = refY - 72, an = 5, w = osc_geo.w - 48, h = 2}
     lo.layer = 13
     lo.style = osc_styles.SeekbarBg
     lo.alpha[1] = 128
     lo.alpha[3] = 128
 
     lo = add_layout('seekbar')
-    lo.geometry = {x = refX, y = refY - 96 , an = 5, w = osc_geo.w - 50, h = 16}
+    lo.geometry = {x = refX, y = refY - 72, an = 5, w = osc_geo.w - 48, h = 16}
     lo.style = osc_styles.SeekbarFg
     lo.slider.gap = 7
     lo.slider.tooltip_style = osc_styles.Tooltip
@@ -1093,83 +1093,86 @@ layouts = function ()
     lo = new_element('volumebarbg', 'box')
     lo.visible = (osc_param.playresx >= 750) and user_opts.volumecontrol
     lo = add_layout('volumebarbg')
-    lo.geometry = {x = 155, y = refY - 40, an = 4, w = 80, h = 2}
+    lo.geometry = {x = 256, y = refY - 32, an = 4, w = 80, h = 2}
     lo.layer = 13
     lo.style = osc_styles.VolumebarBg
 
-    
+
     lo = add_layout('volumebar')
-    lo.geometry = {x = 155, y = refY - 40, an = 4, w = 80, h = 8}
+    lo.geometry = {x = 256, y = refY - 32, an = 4, w = 80, h = 8}
     lo.style = osc_styles.VolumebarFg
     lo.slider.gap = 3
     lo.slider.tooltip_style = osc_styles.Tooltip
     lo.slider.tooltip_an = 2
-        
+
     -- buttons
     lo = add_layout('pl_prev')
-    lo.geometry = {x = refX - 120, y = refY - 40 , an = 5, w = 30, h = 24}
+    lo.geometry = {x = 32, y = refY - 32, an = 5, w = 24, h = 24}
     lo.style = osc_styles.Ctrl2
 
     lo = add_layout('skipback')
-    lo.geometry = {x = refX - 60, y = refY - 40 , an = 5, w = 30, h = 24}
+    lo.geometry = {x = 72, y = refY - 32, an = 5, w = 24, h = 24}
     lo.style = osc_styles.Ctrl2
 
-            
+
     lo = add_layout('playpause')
-    lo.geometry = {x = refX, y = refY - 40 , an = 5, w = 45, h = 45}
-    lo.style = osc_styles.Ctrl1    
+    lo.geometry = {x = 112, y = refY - 32, an = 5, w = 24, h = 24}
+    lo.style = osc_styles.Ctrl2
 
     lo = add_layout('skipfrwd')
-    lo.geometry = {x = refX + 60, y = refY - 40 , an = 5, w = 30, h = 24}
-    lo.style = osc_styles.Ctrl2    
+    lo.geometry = {x = 152, y = refY - 32, an = 5, w = 24, h = 24}
+    lo.style = osc_styles.Ctrl2
 
     lo = add_layout('pl_next')
-    lo.geometry = {x = refX + 120, y = refY - 40 , an = 5, w = 30, h = 24}
+    lo.geometry = {x = 192, y = refY - 32, an = 5, w = 24, h = 24}
     lo.style = osc_styles.Ctrl2
 
 
     -- Time
     lo = add_layout('tc_left')
-    lo.geometry = {x = 25, y = refY - 84, an = 7, w = 64, h = 20}
-    lo.style = osc_styles.Time    
-    
+    lo.geometry = {x = 384, y = refY - 32, an = 5, w = 64, h = 24}
+    lo.style = osc_styles.Time
+
+    lo = add_layout('tc_mid')
+    lo.geometry = {x = 420, y = refY - 32, an = 5, w = 8, h = 24}
+    lo.style = osc_styles.Time
 
     lo = add_layout('tc_right')
-    lo.geometry = {x = osc_geo.w - 25 , y = refY -84, an = 9, w = 64, h = 20}
-    lo.style = osc_styles.Time    
+    lo.geometry = {x = 456 , y = refY -32, an = 5, w = 64, h = 24}
+    lo.style = osc_styles.Time
 
     lo = add_layout('cy_audio')
-    lo.geometry = {x = 37, y = refY - 40, an = 5, w = 24, h = 24}
+    lo.geometry = {x = osc_geo.w - 112, y = refY - 32, an = 5, w = 24, h = 24}
     lo.style = osc_styles.Ctrl3
     lo.visible = (osc_param.playresx >= 540)
-    
+
     lo = add_layout('cy_sub')
-    lo.geometry = {x = 87, y = refY - 40, an = 5, w = 24, h = 24}
+    lo.geometry = {x = osc_geo.w - 152, y = refY - 32, an = 5, w = 24, h = 24}
     lo.style = osc_styles.Ctrl3
     lo.visible = (osc_param.playresx >= 600)
 
     lo = add_layout('vol_ctrl')
-    lo.geometry = {x = 137, y = refY - 40, an = 5, w = 24, h = 24}
+    lo.geometry = {x = 232, y = refY - 32, an = 5, w = 24, h = 24}
     lo.style = osc_styles.Ctrl3
     lo.visible = (osc_param.playresx >= 650)
 
     lo = add_layout('tog_fs')
-    lo.geometry = {x = osc_geo.w - 37, y = refY - 40, an = 5, w = 24, h = 24}
+    lo.geometry = {x = osc_geo.w - 32, y = refY - 32, an = 5, w = 24, h = 24}
     lo.style = osc_styles.Ctrl3
     lo.visible = (osc_param.playresx >= 540)
 
     lo = add_layout('tog_info')
-    lo.geometry = {x = osc_geo.w - 87, y = refY - 40, an = 5, w = 24, h = 24}
+    lo.geometry = {x = osc_geo.w - 72, y = refY - 32, an = 5, w = 24, h = 24}
     lo.style = osc_styles.Ctrl3
     lo.visible = (osc_param.playresx >= 600)
-    
-    geo = { x = 25, y = refY - 132, an = 1, w = osc_geo.w - 50, h = 48 }
+
+    geo = { x = 24, y = refY - 96, an = 1, w = osc_geo.w - 48, h = 48 }
     lo = add_layout('title')
     lo.geometry = geo
     lo.style = string.format('%s{\\clip(%f,%f,%f,%f)}', osc_styles.Title,
                                 geo.x, geo.y - geo.h, geo.x + geo.w , geo.y)
     lo.alpha[3] = 0
-    lo.button.maxchars = geo.w / 23
+    lo.button.maxchars = geo.w / 13
 end
 
 -- Validate string type user options
@@ -1304,7 +1307,7 @@ function osc_init()
 
     --
     update_tracklist()
-    
+
     --cy_audio
     ne = new_element('cy_audio', 'button')
     ne.enabled = (#tracks_osc.audio > 0)
@@ -1334,7 +1337,7 @@ function osc_init()
         function () set_track('audio', -1) end
     ne.eventresponder['mbtn_mid_up'] =
         function () show_message(get_tracklist('audio')) end
-                
+
     --cy_sub
     ne = new_element('cy_sub', 'button')
     ne.enabled = (#tracks_osc.sub > 0)
@@ -1364,7 +1367,7 @@ function osc_init()
         function () set_track('sub', -1) end
     ne.eventresponder['mbtn_mid_up'] =
         function () show_message(get_tracklist('sub')) end
-        
+
     -- vol_ctrl
     ne = new_element('vol_ctrl', 'button')
     ne.enabled = (get_track('audio')>0)
@@ -1378,7 +1381,7 @@ function osc_init()
     end
     ne.eventresponder['mbtn_left_up'] =
         function () mp.commandv('cycle', 'mute') end
-        
+
     --tog_fs
     ne = new_element('tog_fs', 'button')
     ne.content = function ()
@@ -1411,7 +1414,7 @@ function osc_init()
         return not (title == '') and title or ' '
     end
     ne.visible = osc_param.playresy >= 320 and user_opts.showtitle
-    
+
     --seekbar
     ne = new_element('seekbar', 'slider')
 
@@ -1448,7 +1451,7 @@ function osc_init()
 				end
 				if ch == 0 then
 					return string.format('[%s] [0/%d]', mp.format_time(possec), #chapters)
-				elseif chapters[ch].title then 
+				elseif chapters[ch].title then
 					return string.format('[%s] [%d/%d][%s]', mp.format_time(possec), ch, #chapters, chapters[ch].title)
 				end
 			end
@@ -1533,7 +1536,7 @@ function osc_init()
     ne = new_element('volumebar', 'slider')
     ne.visible = (osc_param.playresx >= 700) and user_opts.volumecontrol
     ne.enabled = (get_track('audio')>0)
-    ne.slider.tooltipF = 
+    ne.slider.tooltipF =
 		function (pos)
 			local refpos = state.proc_volume
 			if refpos > 100 then refpos = 100 end
@@ -1583,6 +1586,9 @@ function osc_init()
     ne = new_element('tc_left', 'button')
     ne.content = function () return (mp.get_property_osd('playback-time')) end
 
+    ne = new_element('tc_mid', 'button')
+    ne.content = '/'
+
     -- tc_right (total/remaining time)
     ne = new_element('tc_right', 'button')
     ne.content = function ()
@@ -1595,7 +1601,7 @@ function osc_init()
     end
     ne.eventresponder['mbtn_left_up'] =
         function () state.rightTC_trem = not state.rightTC_trem end
-        
+
     -- load layout
     layouts()
 
@@ -1609,7 +1615,7 @@ function osc_init()
 end
 
 function shutdown()
-    
+
 end
 
 --
@@ -1970,7 +1976,7 @@ function show_logo()
     ass:draw_start()
     ass_draw_cir_cw(ass, 0, 0, 100)
     ass:draw_stop()
-    
+
     ass:new_event()
     ass:pos(logo_x, logo_y)
     ass:append('{\\1c&H632462&\\bord0}')
@@ -1984,7 +1990,7 @@ function show_logo()
     ass:draw_start()
     ass_draw_cir_cw(ass, -4, 4, 50)
     ass:draw_stop()
-        
+
     ass:new_event()
     ass:pos(logo_x, logo_y)
     ass:append('{\\1c&H632462&\\bord&}')
@@ -1993,7 +1999,7 @@ function show_logo()
     ass:line_to(23.3, 5)
     ass:line_to(-20, 30)
     ass:draw_stop()
-    
+
     ass:new_event()
     ass:pos(logo_x, logo_y+110)
     ass:an(8)
@@ -2197,9 +2203,9 @@ function visibility_mode(mode, no_osd)
         msg.warn('Ignoring unknown visibility mode \'' .. mode .. '\'')
         return
     end
-    
+
     user_opts.visibility = mode
-    
+
     if not no_osd and tonumber(mp.get_property('osd-level')) >= 1 then
         mp.osd_message('OSC visibility: ' .. mode)
     end
