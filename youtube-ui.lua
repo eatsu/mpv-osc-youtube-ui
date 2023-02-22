@@ -1285,7 +1285,7 @@ function osc_init()
     ne.eventresponder['mbtn_left_down'] =
         --function () mp.command('seek -5') end
         function () mp.commandv('seek', -5, 'exact') end
-    ne.eventresponder['shift+mbtn_left_down'] =
+    ne.eventresponder['mbtn_mid_down'] =
         function () mp.commandv('frame-back-step') end
     ne.eventresponder['mbtn_right_down'] =
         --function () mp.command('seek -60') end
@@ -1299,7 +1299,7 @@ function osc_init()
     ne.eventresponder['mbtn_left_down'] =
         --function () mp.command('seek +5') end
         function () mp.commandv('seek', 5, 'exact') end
-    ne.eventresponder['shift+mbtn_left_down'] =
+    ne.eventresponder['mbtn_mid_down'] =
         function () mp.commandv('frame-step') end
     ne.eventresponder['mbtn_right_down'] =
         --function () mp.command('seek +60') end
