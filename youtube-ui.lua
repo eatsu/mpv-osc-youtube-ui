@@ -1129,16 +1129,8 @@ layouts = function ()
 
 
     -- Time
-    lo = add_layout('tc_left')
-    lo.geometry = {x = 384, y = refY - 32, an = 5, w = 64, h = 24}
-    lo.style = osc_styles.Time
-
-    lo = add_layout('tc_mid')
-    lo.geometry = {x = 420, y = refY - 32, an = 5, w = 8, h = 24}
-    lo.style = osc_styles.Time
-
-    lo = add_layout('tc_right')
-    lo.geometry = {x = 456 , y = refY -32, an = 5, w = 64, h = 24}
+    lo = add_layout('tc_both')
+    lo.geometry = {x = 352, y = refY - 32, an = 4, w = 128, h = 24}
     lo.style = osc_styles.Time
 
     lo = add_layout('cy_audio')
@@ -1582,21 +1574,15 @@ function osc_init()
         function (element)
 			set_volume(state.proc_volume-5)
 		end
-    -- tc_left (current pos)
-    ne = new_element('tc_left', 'button')
-    ne.content = function () return (mp.get_property_osd('playback-time')) end
 
-    ne = new_element('tc_mid', 'button')
-    ne.content = '/'
-
-    -- tc_right (total/remaining time)
-    ne = new_element('tc_right', 'button')
+    -- tc_both (current pos + total/remaining time)
+    ne = new_element('tc_both', 'button')
     ne.content = function ()
         if (mp.get_property_number('duration', 0) <= 0) then return '--:--:--' end
         if (state.rightTC_trem) then
-            return ('-'..mp.get_property_osd('playtime-remaining'))
+            return (mp.get_property_osd('playback-time')..' / -'..mp.get_property_osd('playtime-remaining'))
         else
-            return (mp.get_property_osd('duration'))
+            return (mp.get_property_osd('playback-time')..' / '..mp.get_property_osd('duration'))
         end
     end
     ne.eventresponder['mbtn_left_up'] =
