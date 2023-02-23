@@ -727,6 +727,15 @@ function render_elements(master_ass)
                 end
             end
 
+            -- FIXME: properly implement the hover/pressed states
+            if not element.enabled then
+                element.layout.alpha[1] = 153
+            elseif not mouse_hit(element) then
+                element.layout.alpha[1] = 51
+            else
+                element.layout.alpha[1] = 0
+            end
+
             elem_ass:append(buttontext)
 
             -- add tooltip
