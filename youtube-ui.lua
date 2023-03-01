@@ -23,7 +23,7 @@ local user_opts = {
                                 -- mouse movement. enforced non-negative for the
                                 -- user, but internally negative is 'always-on'.
     fadeduration = 500,         -- duration of fade out in ms, 0 = no fade
-    minmousemove = 3,           -- minimum amount of pixels the mouse has to
+    minmousemove = 0,           -- minimum amount of pixels the mouse has to
                                 -- move between ticks to make the OSC show up
     iamaprogrammer = false,     -- use native mpv values and disable OSC
                                 -- internal track list management (and some
