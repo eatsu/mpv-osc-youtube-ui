@@ -22,7 +22,7 @@ local user_opts = {
     hidetimeout = 1000,         -- duration in ms until the OSC hides if no
                                 -- mouse movement. enforced non-negative for the
                                 -- user, but internally negative is 'always-on'.
-    fadeduration = 500,         -- duration of fade out in ms, 0 = no fade
+    fadeduration = 150,         -- duration of fade out in ms, 0 = no fade
     minmousemove = 0,           -- minimum amount of pixels the mouse has to
                                 -- move between ticks to make the OSC show up
     iamaprogrammer = false,     -- use native mpv values and disable OSC
@@ -1626,10 +1626,14 @@ function show_osc()
     --remember last time of invocation (mouse move)
     state.showtime = mp.get_time()
 
-    osc_visible(true)
-
     if (user_opts.fadeduration > 0) then
-        state.anitype = nil
+        if not(state.osc_visible == false) and not state.animation then
+            state.anitype = nil
+        else
+            state.anitype = 'in'
+        end
+    else
+        osc_visible(true)
     end
 end
 
