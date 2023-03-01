@@ -1084,14 +1084,14 @@ layouts = function ()
     --
     new_element('seekbarbg', 'box')
     lo = add_layout('seekbarbg')
-    lo.geometry = {x = refX , y = refY - 72, an = 5, w = osc_geo.w - 48, h = 2}
+    lo.geometry = {x = refX , y = refY - 64, an = 5, w = osc_geo.w - 32, h = 2}
     lo.layer = 13
     lo.style = osc_styles.SeekbarBg
     lo.alpha[1] = 128
     lo.alpha[3] = 128
 
     lo = add_layout('seekbar')
-    lo.geometry = {x = refX, y = refY - 72, an = 5, w = osc_geo.w - 48, h = 16}
+    lo.geometry = {x = refX, y = refY - 64, an = 5, w = osc_geo.w - 32, h = 16}
     lo.style = osc_styles.SeekbarFg
     lo.slider.gap = 7
     lo.slider.tooltip_style = osc_styles.Tooltip
@@ -1102,13 +1102,13 @@ layouts = function ()
     lo = new_element('volumebarbg', 'box')
     lo.visible = (osc_param.playresx >= 750) and user_opts.volumecontrol
     lo = add_layout('volumebarbg')
-    lo.geometry = {x = 256, y = refY - 32, an = 4, w = 80, h = 2}
+    lo.geometry = {x = 252, y = refY - 28, an = 4, w = 80, h = 2}
     lo.layer = 13
     lo.style = osc_styles.VolumebarBg
 
 
     lo = add_layout('volumebar')
-    lo.geometry = {x = 256, y = refY - 32, an = 4, w = 80, h = 8}
+    lo.geometry = {x = 252, y = refY - 28, an = 4, w = 80, h = 8}
     lo.style = osc_styles.VolumebarFg
     lo.slider.gap = 3
     lo.slider.tooltip_style = osc_styles.Tooltip
@@ -1116,63 +1116,63 @@ layouts = function ()
 
     -- buttons
     lo = add_layout('pl_prev')
-    lo.geometry = {x = 32, y = refY - 32, an = 5, w = 40, h = 64}
+    lo.geometry = {x = 28, y = refY - 28, an = 5, w = 40, h = 56}
     lo.style = osc_styles.Ctrl2
 
     lo = add_layout('skipback')
-    lo.geometry = {x = 72, y = refY - 32, an = 5, w = 40, h = 64}
+    lo.geometry = {x = 68, y = refY - 28, an = 5, w = 40, h = 56}
     lo.style = osc_styles.Ctrl2
 
 
     lo = add_layout('playpause')
-    lo.geometry = {x = 112, y = refY - 32, an = 5, w = 40, h = 64}
+    lo.geometry = {x = 108, y = refY - 28, an = 5, w = 40, h = 56}
     lo.style = osc_styles.Ctrl2
 
     lo = add_layout('skipfrwd')
-    lo.geometry = {x = 152, y = refY - 32, an = 5, w = 40, h = 64}
+    lo.geometry = {x = 148, y = refY - 28, an = 5, w = 40, h = 56}
     lo.style = osc_styles.Ctrl2
 
     lo = add_layout('pl_next')
-    lo.geometry = {x = 192, y = refY - 32, an = 5, w = 40, h = 64}
+    lo.geometry = {x = 188, y = refY - 28, an = 5, w = 40, h = 56}
     lo.style = osc_styles.Ctrl2
 
 
     -- Time
     lo = add_layout('tc_both')
-    lo.geometry = {x = 352, y = refY - 32, an = 4, w = 128, h = 64}
+    lo.geometry = {x = 348, y = refY - 28, an = 4, w = 128, h = 56}
     lo.style = osc_styles.Time
 
     lo = add_layout('cy_audio')
-    lo.geometry = {x = osc_geo.w - 112, y = refY - 32, an = 5, w = 40, h = 64}
+    lo.geometry = {x = osc_geo.w - 108, y = refY - 28, an = 5, w = 40, h = 56}
     lo.style = osc_styles.Ctrl3
     lo.visible = (osc_param.playresx >= 540)
 
     lo = add_layout('cy_sub')
-    lo.geometry = {x = osc_geo.w - 152, y = refY - 32, an = 5, w = 40, h = 64}
+    lo.geometry = {x = osc_geo.w - 148, y = refY - 28, an = 5, w = 40, h = 56}
     lo.style = osc_styles.Ctrl3
     lo.visible = (osc_param.playresx >= 600)
 
     lo = add_layout('vol_ctrl')
-    lo.geometry = {x = 232, y = refY - 32, an = 5, w = 40, h = 64}
+    lo.geometry = {x = 228, y = refY - 28, an = 5, w = 40, h = 56}
     lo.style = osc_styles.Ctrl3
     lo.visible = (osc_param.playresx >= 650)
 
     lo = add_layout('tog_fs')
-    lo.geometry = {x = osc_geo.w - 32, y = refY - 32, an = 5, w = 40, h = 64}
+    lo.geometry = {x = osc_geo.w - 28, y = refY - 28, an = 5, w = 40, h = 56}
     lo.style = osc_styles.Ctrl3
     lo.visible = (osc_param.playresx >= 540)
 
     lo = add_layout('tog_info')
-    lo.geometry = {x = osc_geo.w - 72, y = refY - 32, an = 5, w = 40, h = 64}
+    lo.geometry = {x = osc_geo.w - 68, y = refY - 28, an = 5, w = 40, h = 56}
     lo.style = osc_styles.Ctrl3
     lo.visible = (osc_param.playresx >= 600)
 
-    geo = { x = 24, y = refY - 96, an = 1, w = osc_geo.w - 48, h = 48 }
+    geo = { x = 20, y = refY - 92, an = 1, w = osc_geo.w - 48, h = 48 }
     lo = add_layout('title')
     lo.geometry = geo
     lo.style = string.format('%s{\\clip(%f,%f,%f,%f)}', osc_styles.Title,
                                 geo.x, geo.y - geo.h, geo.x + geo.w , geo.y)
-    lo.alpha[3] = 0
+    lo.alpha[3] = 204
     lo.button.maxchars = geo.w / 13
 end
 
