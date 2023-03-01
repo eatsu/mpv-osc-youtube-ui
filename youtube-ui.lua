@@ -439,7 +439,7 @@ end
 function window_controls_enabled()
     val = user_opts.windowcontrols
     if val == 'auto' then
-        return (not state.border) or state.fullscreen
+        return not state.border
     else
         return val ~= 'no'
     end
