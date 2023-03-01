@@ -1116,54 +1116,54 @@ layouts = function ()
 
     -- buttons
     lo = add_layout('pl_prev')
-    lo.geometry = {x = 32, y = refY - 32, an = 5, w = 24, h = 24}
+    lo.geometry = {x = 32, y = refY - 32, an = 5, w = 40, h = 64}
     lo.style = osc_styles.Ctrl2
 
     lo = add_layout('skipback')
-    lo.geometry = {x = 72, y = refY - 32, an = 5, w = 24, h = 24}
+    lo.geometry = {x = 72, y = refY - 32, an = 5, w = 40, h = 64}
     lo.style = osc_styles.Ctrl2
 
 
     lo = add_layout('playpause')
-    lo.geometry = {x = 112, y = refY - 32, an = 5, w = 24, h = 24}
+    lo.geometry = {x = 112, y = refY - 32, an = 5, w = 40, h = 64}
     lo.style = osc_styles.Ctrl2
 
     lo = add_layout('skipfrwd')
-    lo.geometry = {x = 152, y = refY - 32, an = 5, w = 24, h = 24}
+    lo.geometry = {x = 152, y = refY - 32, an = 5, w = 40, h = 64}
     lo.style = osc_styles.Ctrl2
 
     lo = add_layout('pl_next')
-    lo.geometry = {x = 192, y = refY - 32, an = 5, w = 24, h = 24}
+    lo.geometry = {x = 192, y = refY - 32, an = 5, w = 40, h = 64}
     lo.style = osc_styles.Ctrl2
 
 
     -- Time
     lo = add_layout('tc_both')
-    lo.geometry = {x = 352, y = refY - 32, an = 4, w = 128, h = 24}
+    lo.geometry = {x = 352, y = refY - 32, an = 4, w = 128, h = 64}
     lo.style = osc_styles.Time
 
     lo = add_layout('cy_audio')
-    lo.geometry = {x = osc_geo.w - 112, y = refY - 32, an = 5, w = 24, h = 24}
+    lo.geometry = {x = osc_geo.w - 112, y = refY - 32, an = 5, w = 40, h = 64}
     lo.style = osc_styles.Ctrl3
     lo.visible = (osc_param.playresx >= 540)
 
     lo = add_layout('cy_sub')
-    lo.geometry = {x = osc_geo.w - 152, y = refY - 32, an = 5, w = 24, h = 24}
+    lo.geometry = {x = osc_geo.w - 152, y = refY - 32, an = 5, w = 40, h = 64}
     lo.style = osc_styles.Ctrl3
     lo.visible = (osc_param.playresx >= 600)
 
     lo = add_layout('vol_ctrl')
-    lo.geometry = {x = 232, y = refY - 32, an = 5, w = 24, h = 24}
+    lo.geometry = {x = 232, y = refY - 32, an = 5, w = 40, h = 64}
     lo.style = osc_styles.Ctrl3
     lo.visible = (osc_param.playresx >= 650)
 
     lo = add_layout('tog_fs')
-    lo.geometry = {x = osc_geo.w - 32, y = refY - 32, an = 5, w = 24, h = 24}
+    lo.geometry = {x = osc_geo.w - 32, y = refY - 32, an = 5, w = 40, h = 64}
     lo.style = osc_styles.Ctrl3
     lo.visible = (osc_param.playresx >= 540)
 
     lo = add_layout('tog_info')
-    lo.geometry = {x = osc_geo.w - 72, y = refY - 32, an = 5, w = 24, h = 24}
+    lo.geometry = {x = osc_geo.w - 72, y = refY - 32, an = 5, w = 40, h = 64}
     lo.style = osc_styles.Ctrl3
     lo.visible = (osc_param.playresx >= 600)
 
