@@ -1,12 +1,19 @@
 # mpv-osc-youtube-ui
 
-This is a fork of [mpv-osc-modern](https://github.com/maoiscat/mpv-osc-modern).
-Differences from upstream are:
-
-- YouTube-like asymmetric UI
-- more compact
+This is an [mpv](https://github.com/mpv-player/mpv) OSC script with YouTube-like UI/UX, based on [mpv-osc-modern](https://github.com/maoiscat/mpv-osc-modern).
 
 ![preview](preview.png?raw=true)
+
+## Changes from mpv-osc-modern
+
+- YouTube-like UI
+- More compact layout
+- Hover effect for buttons
+- Softer black gradient background
+- Fade-in effect on popup
+- Shorter duration for fade-in/out
+- No deadzone (OSC will show up anywhere in the window with mouse movement)
+- No window controls when full screen
 
 ## Installation
 
