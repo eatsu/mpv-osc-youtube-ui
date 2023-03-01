@@ -17,34 +17,27 @@ This is an [mpv](https://github.com/mpv-player/mpv) OSC script with YouTube-like
 
 ## Installation
 
-1. Install `youtube-ui.lua` into `~/.config/mpv/scripts`:
+1. Put `youtube-ui.lua` in your mpv `scripts` directory:
 
 ```sh
 mkdir -p ~/.config/mpv/scripts
 wget -P ~/.config/mpv/scripts https://github.com/eatsu/mpv-osc-youtube-ui/raw/main/youtube-ui.lua
 ```
 
-2. Install `Material-Design-Iconic-Font.ttf` into `~/.local/share/fonts`:
+2. Install the `Material-Design-Iconic-Font.ttf` font:
 
 ```sh
 mkdir -p ~/.local/share/fonts
 wget -P ~/.local/share/fonts https://github.com/eatsu/mpv-osc-youtube-ui/raw/main/Material-Design-Iconic-Font.ttf
 ```
 
-3. Add the following lines to the end of `~/.config/mpv/mpv.conf`:
+3. Add `osc=no` to your `mpv.conf` file:
 
-```conf
-osc=no
-
-[Idle]
-profile-cond=p["idle-active"]
-profile-restore=copy-equal
-title=' '
-keepaspect=no
-background=1
+```sh
+echo 'osc=no' >> ~/.config/mpv/mpv.conf
 ```
 
-4. (optional) Install `thumbfast.lua` from [thumbfast](https://github.com/po5/thumbfast) into `~/.config/mpv/scripts`:
+4. (optional) Put `thumbfast.lua` from [thumbfast](https://github.com/po5/thumbfast) in your mpv `scripts` directory:
 
 ```sh
 wget -P ~/.config/mpv/scripts https://github.com/po5/thumbfast/raw/master/thumbfast.lua
