@@ -93,8 +93,8 @@ local osc_styles = {
     TransBg = '{\\blur100\\bord90\\1c&H000000&\\3c&H000000&}',
     SeekbarBg = '{\\blur0\\bord0\\1c&HFFFFFF&}',
     SeekbarFg = '{\\blur1\\bord1\\1c&HE39C42&}',
-    VolumebarBg = '{\\blur0\\bord0\\1c&H999999&}',
-    VolumebarFg = '{\\blur1\\bord1\\1c&HFFFFFF&}',
+    VolumebarBg = '{\\blur0\\bord0\\1c&HFFFFFF&}',
+    VolumebarFg = '{\\blur1\\bord1\\1c&HCCCCCC&}',
     Ctrl1 = '{\\blur0\\bord0\\1c&HFFFFFF&\\3c&HFFFFFF&\\fs36\\fnmaterial-design-iconic-font}',
     Ctrl2 = '{\\blur0\\bord0\\1c&HFFFFFF&\\3c&HFFFFFF&\\fs24\\fnmaterial-design-iconic-font}',
     Ctrl3 = '{\\blur0\\bord0\\1c&HFFFFFF&\\3c&HFFFFFF&\\fs24\\fnmaterial-design-iconic-font}',
@@ -1087,8 +1087,7 @@ layouts = function ()
     lo.geometry = {x = refX , y = refY - 64, an = 5, w = osc_geo.w - 32, h = 2}
     lo.layer = 13
     lo.style = osc_styles.SeekbarBg
-    lo.alpha[1] = 128
-    lo.alpha[3] = 128
+    lo.alpha[1] = 153
 
     lo = add_layout('seekbar')
     lo.geometry = {x = refX, y = refY - 64, an = 5, w = osc_geo.w - 32, h = 16}
@@ -1105,6 +1104,7 @@ layouts = function ()
     lo.geometry = {x = 252, y = refY - 28, an = 4, w = 80, h = 2}
     lo.layer = 13
     lo.style = osc_styles.VolumebarBg
+    lo.alpha[1] = 153
 
 
     lo = add_layout('volumebar')
