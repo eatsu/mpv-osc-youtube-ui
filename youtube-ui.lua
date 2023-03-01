@@ -1053,8 +1053,8 @@ layouts = function ()
     add_area('input', get_hitbox_coords(posX, posY, 1, osc_geo.w, 104))
 
     -- area for show/hide
-    add_area('showhide', 0, osc_param.playresy-200, osc_param.playresx, osc_param.playresy)
-    add_area('showhide_wc', osc_param.playresx*0.67, 0, osc_param.playresx, 48)
+    add_area('showhide', 0, 0, osc_param.playresx, osc_param.playresy)
+    add_area('showhide_wc', 0, 0, osc_param.playresx, osc_param.playresy)
 
     -- fetch values
     local osc_w, osc_h=
