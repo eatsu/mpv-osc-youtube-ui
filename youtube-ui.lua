@@ -11,6 +11,7 @@ local utils = require 'mp.utils'
 local user_opts = {
     showwindowed = true,        -- show OSC when windowed?
     showfullscreen = true,      -- show OSC when fullscreen?
+    idlescreen = true,          -- show mpv logo on idle
     scalewindowed = 1,          -- scaling of the controller when windowed
     scalefullscreen = 1,        -- scaling of the controller when fullscreen
     scaleforcedwindow = 2,      -- scaling when rendered on a forced window
@@ -33,7 +34,9 @@ local user_opts = {
     showtitle = true,           -- show title and no hide timeout on pause
     timetotal = true,           -- display total time instead of remaining time?
     visibility = "auto",        -- only used at init to set visibility_mode(...)
+    boxvideo = false,           -- apply osc_param.video_margins to video
     windowcontrols = "auto",    -- whether to show window controls
+    livemarkers = true,         -- update seekbar chapter markers on duration change
     volumecontrol = true,       -- whether to show mute button and volumne slider
     processvolume = true,		-- volue slider show processd volume
     language = "eng",           -- eng=English, chs=Chinese
@@ -86,6 +89,9 @@ local osc_param = { -- calculated by osc_init()
     display_aspect = 1,
     unscaled_y = 0,
     areas = {},
+    video_margins = {
+        l = 0, r = 0, t = 0, b = 0,         -- left/right/top/bottom
+    },
 }
 
 local osc_styles = {
@@ -117,6 +123,7 @@ local state = {
     rightTC_trem = not user_opts.timetotal, -- if the right timecode should display total or remaining time
     mp_screen_sizeX, mp_screen_sizeY,       -- last screen-resolution, to detect resolution changes to issue reINITs
     initREQ = false,                        -- is a re-init request pending?
+    marginsREQ = false,                     -- is a margins update pending?
     last_mouseX, last_mouseY,               -- last mouse position, to detect significant mouse movement
     mouse_in_window = false,
     message_text,
@@ -132,9 +139,11 @@ local state = {
     showhide_enabled = false,
     windowcontrols_buttons = false,
     dmx_cache = 0,
+    using_video_margins = false,
     border = true,
     maximized = false,
     osd = mp.create_osd_overlay("ass-events"),
+    chapter_list = {},                      -- sorted by time
     mute = false,
     lastvisibility = user_opts.visibility,		-- save last visibility on pause if showtitle
     sys_volume,									--system volume
@@ -155,6 +164,12 @@ local tick_delay = 0.03
 -- Helperfunctions
 --
 
+function kill_animation()
+    state.anistart = nil
+    state.animation = nil
+    state.anitype =  nil
+end
+
 function set_osd(res_x, res_y, text)
     if state.osd.res_x == res_x and
        state.osd.res_y == res_y and
@@ -167,6 +182,13 @@ function set_osd(res_x, res_y, text)
     state.osd.z = 1000
     state.osd:update()
 end
+
+local margins_opts = {
+    {"l", "video-margin-ratio-left"},
+    {"r", "video-margin-ratio-right"},
+    {"t", "video-margin-ratio-top"},
+    {"b", "video-margin-ratio-bottom"},
+}
 
 -- scale factor for translating between real and virtual ASS coordinates
 function get_virt_scale_factor()
@@ -284,6 +306,14 @@ function countone(val)
         val = val + 1
     end
     return val
+end
+
+-- align:  -1 .. +1
+-- frame:  size of the containing area
+-- obj:    size of the object that should be positioned inside the area
+-- margin: min. distance from object to frame (as long as -1 <= align <= +1)
+function get_align(align, frame, obj, margin)
+    return (frame / 2) + (((frame / 2) - margin - (obj / 2)) * align)
 end
 
 -- multiplies two alpha values, formular can probably be improved
@@ -416,9 +446,9 @@ function set_track(type, next)
     mp.commandv("set", type, new_track_mpv)
 
     if (new_track_osc == 0) then
-        show_message(nicetypes[type] .. " Track: none")
+        show_message(nicetypes[type] .. texts.track .. texts.none)
     else
-        show_message(nicetypes[type]  .. " Track: "
+        show_message(nicetypes[type]  .. texts.track
             .. new_track_osc .. "/" .. #tracks_osc[type]
             .. " [".. (tracks_osc[type][new_track_osc].lang or "unknown") .."] "
             .. (tracks_osc[type][new_track_osc].title or ""))
@@ -578,7 +608,34 @@ end
 -- Element Rendering
 --
 
+-- returns nil or a chapter element from the native property chapter-list
+function get_chapter(possec)
+    local cl = state.chapter_list  -- sorted, get latest before possec, if any
+
+    for n=#cl,1,-1 do
+        if possec >= cl[n].time then
+            return cl[n]
+        end
+    end
+end
+
 function render_elements(master_ass)
+
+    -- when the slider is dragged or hovered and we have a target chapter name
+    -- then we use it instead of the normal title. we calculate it before the
+    -- render iterations because the title may be rendered before the slider.
+    state.forced_title = nil
+    local se, ae = state.slider_element, elements[state.active_element]
+    if user_opts.chapter_fmt ~= "no" and se and (ae == se or (not ae and mouse_hit(se))) then
+        local dur = mp.get_property_number("duration", 0)
+        if dur > 0 then
+            local possec = get_slider_value(se) * dur / 100 -- of mouse pos
+            local ch = get_chapter(possec)
+            if ch and ch.title and ch.title ~= "" then
+                state.forced_title = string.format(user_opts.chapter_fmt, ch.title)
+            end
+        end
+    end
 
     for n=1, #elements do
         local element = elements[n]
@@ -1211,6 +1268,7 @@ function update_options(list)
     validate_user_opts()
     request_tick()
     visibility_mode(user_opts.visibility, true)
+    update_duration_watch()
     request_init()
 end
 
@@ -1244,6 +1302,8 @@ function osc_init()
 
     -- stop seeking with the slider to prevent skipping files
     state.active_element = nil
+
+    osc_param.video_margins = {l = 0, r = 0, t = 0, b = 0}
 
     elements = {}
 
@@ -1428,8 +1488,10 @@ function osc_init()
     -- title
     ne = new_element("title", "button")
     ne.content = function ()
-        local title = mp.command_native({"expand-text", user_opts.title})
+        local title = state.forced_title or
+                      mp.command_native({"expand-text", user_opts.title})
         if state.paused then
+            -- escape ASS, and strip newlines and trailing slashes
             title = title:gsub("\\n", " "):gsub("\\$", ""):gsub("{","\\{")
         else
             title = " "
@@ -1442,6 +1504,7 @@ function osc_init()
     ne = new_element("seekbar", "slider")
 
     ne.enabled = not (mp.get_property("percent-pos") == nil)
+    state.slider_element = ne.enabled and ne or nil  -- used for forced_title
     ne.thumbnail = true
     ne.slider.markerF = function ()
         local duration = mp.get_property_number("duration", nil)
@@ -1630,10 +1693,64 @@ function osc_init()
 
     --do something with the elements
     prepare_elements()
+
+    update_margins()
+end
+
+function reset_margins()
+    if state.using_video_margins then
+        for _, opt in ipairs(margins_opts) do
+            mp.set_property_number(opt[2], 0.0)
+        end
+        state.using_video_margins = false
+    end
+end
+
+function update_margins()
+    local margins = osc_param.video_margins
+
+    -- Don't use margins if it's visible only temporarily.
+    if (not state.osc_visible) or (get_hidetimeout() >= 0) or
+       (state.fullscreen and not user_opts.showfullscreen) or
+       (not state.fullscreen and not user_opts.showwindowed)
+    then
+        margins = {l = 0, r = 0, t = 0, b = 0}
+    end
+
+    if user_opts.boxvideo then
+        -- check whether any margin option has a non-default value
+        local margins_used = false
+
+        if not state.using_video_margins then
+            for _, opt in ipairs(margins_opts) do
+                if mp.get_property_number(opt[2], 0.0) ~= 0.0 then
+                    margins_used = true
+                end
+            end
+        end
+
+        if not margins_used then
+            for _, opt in ipairs(margins_opts) do
+                local v = margins[opt[1]]
+                if (v ~= 0) or state.using_video_margins then
+                    mp.set_property_number(opt[2], v)
+                    state.using_video_margins = true
+                end
+            end
+        end
+    else
+        reset_margins()
+    end
+
+    utils.shared_script_property_set("osc-margins",
+        string.format("%f,%f,%f,%f", margins.l, margins.r, margins.t, margins.b))
+    mp.set_property_native("user-data/osc/margins", margins)
 end
 
 function shutdown()
-
+    reset_margins()
+    utils.shared_script_property_set("osc-margins", nil)
+    mp.del_property("user-data/osc")
 end
 
 --
@@ -1680,6 +1797,7 @@ end
 function osc_visible(visible)
     if state.osc_visible ~= visible then
         state.osc_visible = visible
+        update_margins()
     end
     request_tick()
 end
@@ -1768,7 +1886,14 @@ function render()
     end
 
     -- init management
-    if state.initREQ then
+    if state.active_element then
+        -- mouse is held down on some element - keep ticking and igore initReq
+        -- till it's released, or else the mouse-up (click) will misbehave or
+        -- get ignored. that's because osc_init() recreates the osc elements,
+        -- but mouse handling depends on the elements staying unmodified
+        -- between mouse-down and mouse-up (using the index active_element).
+        request_tick()
+    elseif state.initREQ then
         osc_init()
         state.initREQ = false
 
@@ -1805,14 +1930,10 @@ function render()
             if (state.anitype == "out") then
                 osc_visible(false)
             end
-            state.anistart = nil
-            state.animation = nil
-            state.anitype =  nil
+            kill_animation()
         end
     else
-        state.anistart = nil
-        state.animation = nil
-        state.anitype =  nil
+        kill_animation()
     end
 
     --mouse show/hide area
@@ -2039,6 +2160,11 @@ end
 
 -- called by mpv on every frame
 function tick()
+    if state.marginsREQ == true then
+        update_margins()
+        state.marginsREQ = false
+    end
+
     if (not state.enabled) then return end
 
     if (state.idle) then
@@ -2060,13 +2186,23 @@ function tick()
         render()
     else
         -- Flush OSD
-        set_osd(osc_param.playresy, osc_param.playresy, '')
+        render_wipe()
     end
 
     state.tick_last_time = mp.get_time()
 
     if state.anitype ~= nil then
-        request_tick()
+        -- state.anistart can be nil - animation should now start, or it can
+        -- be a timestamp when it started. state.idle has no animation.
+        if not state.idle and
+           (not state.anistart or
+            mp.get_time() < 1 + state.anistart + user_opts.fadeduration/1000)
+        then
+            -- animating or starting, or still within 1s past the deadline
+            request_tick()
+        else
+            kill_animation()
+        end
     end
 end
 
@@ -2094,12 +2230,42 @@ function enable_osc(enable)
     end
 end
 
+-- duration is observed for the sole purpose of updating chapter markers
+-- positions. live streams with chapters are very rare, and the update is also
+-- expensive (with request_init), so it's only observed when we have chapters
+-- and the user didn't disable the livemarkers option (update_duration_watch).
+function on_duration() request_init() end
+
+local duration_watched = false
+function update_duration_watch()
+    local want_watch = user_opts.livemarkers and
+                       (mp.get_property_number("chapters", 0) or 0) > 0 and
+                       true or false  -- ensure it's a boolean
+
+    if (want_watch ~= duration_watched) then
+        if want_watch then
+            mp.observe_property("duration", nil, on_duration)
+        else
+            mp.unobserve_property(on_duration)
+        end
+        duration_watched = want_watch
+    end
+end
+
 validate_user_opts()
+update_duration_watch()
 
 mp.register_event("shutdown", shutdown)
 mp.register_event("start-file", request_init)
 mp.observe_property("track-list", nil, request_init)
 mp.observe_property("playlist", nil, request_init)
+mp.observe_property("chapter-list", "native", function(_, list)
+    list = list or {}  -- safety, shouldn't return nil
+    table.sort(list, function(a, b) return a.time < b.time end)
+    state.chapter_list = list
+    update_duration_watch()
+    request_init()
+end)
 
 mp.register_script_message("osc-message", show_message)
 mp.register_script_message("osc-chapterlist", function(dur)
@@ -2119,6 +2285,7 @@ end)
 mp.observe_property("fullscreen", "bool",
     function(name, val)
         state.fullscreen = val
+        state.marginsREQ = true
         request_init_resize()
     end
 )
@@ -2249,6 +2416,8 @@ function visibility_mode(mode, no_osd)
     end
 
     user_opts.visibility = mode
+    utils.shared_script_property_set("osc-visibility", mode)
+    mp.set_property_native("user-data/osc/visibility", mode)
 
     if not no_osd and tonumber(mp.get_property("osd-level")) >= 1 then
         mp.osd_message("OSC visibility: " .. mode)
@@ -2260,12 +2429,41 @@ function visibility_mode(mode, no_osd)
     mp.disable_key_bindings("input")
     mp.disable_key_bindings("window-controls")
     state.input_enabled = false
+
+    update_margins()
+    request_tick()
+end
+
+function idlescreen_visibility(mode, no_osd)
+    if mode == "cycle" then
+        if user_opts.idlescreen then
+            mode = "no"
+        else
+            mode = "yes"
+        end
+    end
+
+    if mode == "yes" then
+        user_opts.idlescreen = true
+    else
+        user_opts.idlescreen = false
+    end
+
+    utils.shared_script_property_set("osc-idlescreen", mode)
+    mp.set_property_native("user-data/osc/idlescreen", user_opts.idlescreen)
+
+    if not no_osd and tonumber(mp.get_property("osd-level")) >= 1 then
+        mp.osd_message("OSC logo visibility: " .. tostring(mode))
+    end
+
     request_tick()
 end
 
 visibility_mode(user_opts.visibility, true)
 mp.register_script_message("osc-visibility", visibility_mode)
 mp.add_key_binding(nil, "visibility", function() visibility_mode("cycle") end)
+
+mp.register_script_message("osc-idlescreen", idlescreen_visibility)
 
 mp.register_script_message("thumbfast-info", function(json)
     local data = utils.parse_json(json)
