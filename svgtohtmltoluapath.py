@@ -36,6 +36,9 @@ icons = [
 	'volume_mute',
 ]
 
+if len(sys.argv) > 1:
+	icons = sys.argv[1:]
+
 canvasSizePattern = re.compile(r'    \<canvas id=\'canvas\' width=\'(-?\d+(\.\d+)?)\' height=\'(-?\d+(\.\d+)?)\'\>\<\/canvas\>')
 transformPattern = re.compile(r'\tctx.transform\(.+')
 moveToPattern = re.compile(r'\tctx.moveTo\((-?\d+\.\d+), (-?\d+\.\d+)\);')
@@ -119,6 +122,9 @@ def printIcon(name, htmlFilepath):
 
 def genIconPath(name):
 	svgFilepath = os.path.join('icons', name + '.svg')
+	if not os.path.exists(svgFilepath):
+		print(f"Error: File '{svgFilepath}' does not exist.")
+		sys.exit(1)
 	htmlFilepath = convertToCanvas(svgFilepath)
 	printIcon(name, htmlFilepath)
 	os.remove(htmlFilepath)
