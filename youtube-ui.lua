@@ -98,7 +98,7 @@ local osc_param = { -- calculated by osc_init()
 }
 
 local osc_styles = {
-    TransBg = "{\\blur100\\bord90\\1c&H000000&\\3c&H000000&}",
+    box = "{\\blur100\\bord0\\1c&H000000&\\3c&H000000&}",
     SeekbarBg = "{\\blur0\\bord0\\1c&HFFFFFF&}",
     SeekbarFg = "{\\blur1\\bord1\\1c&HE39C42&}",
     VolumebarBg = "{\\blur0\\bord0\\1c&HFFFFFF&}",
@@ -1138,45 +1138,47 @@ end
 --
 
 function layouts()
+    local osc_geo = {
+        x = 0,
+        y = osc_param.playresy,
+        an = 1,
+        w = osc_param.playresx,
+        h = 72,
+    }
 
-    local osc_geo = {w, h}
+    local refX = osc_geo.w / 2
+    local refY = osc_geo.y
 
-    osc_geo.w = osc_param.playresx
-    osc_geo.h = 180
-
-    -- origin of the controllers, left/bottom corner
-    local posX = 0
-    local posY = osc_param.playresy
-
+    local btnY = refY - 28
+    local btnW = 40
+    local btnH = 56
     local tcW = (state.tc_ms) and 180 or 128
 
     osc_param.areas = {} -- delete areas
 
     -- area for active mouse input
-    add_area("input", get_hitbox_coords(posX, posY, 1, osc_geo.w, 104))
+    add_area("input", get_hitbox_coords(osc_geo.x, osc_geo.y, osc_geo.an,
+                                        osc_geo.w, osc_geo.h))
 
     -- area for show/hide
     add_area("showhide", 0, 0, osc_param.playresx, osc_param.playresy)
     add_area("showhide_wc", 0, 0, osc_param.playresx, osc_param.playresy)
 
-    -- fetch values
-    local osc_w, osc_h=
-        osc_geo.w, osc_geo.h
-
-    local lo
+    local lo, geo
 
     -- Background bar
-    new_element("TransBg", "box")
-    lo = add_layout("TransBg")
-    lo.geometry = {x = posX, y = posY, an = 7, w = osc_w, h = 1}
-    lo.style = osc_styles.TransBg
+    new_element("bgbox", "box")
+    lo = add_layout("bgbox")
+    lo.geometry = {
+        x = osc_geo.x - 200,
+        y = osc_geo.y,
+        an = 4,
+        w = osc_geo.w + 400,
+        h = 160,
+    }
     lo.layer = 10
+    lo.style = osc_styles.box
     lo.alpha[3] = 0
-
-    -- Alignment
-    local refX = osc_w / 2
-    local refY = posY
-    local geo
 
     -- Seekbar
     new_element("seekbarbg", "box")
@@ -1197,13 +1199,13 @@ function layouts()
     lo = new_element("volumebarbg", "box")
     lo.visible = (osc_param.playresx >= 750) and user_opts.volumecontrol
     lo = add_layout("volumebarbg")
-    lo.geometry = {x = 252, y = refY - 28, an = 4, w = 80, h = 2}
+    lo.geometry = {x = 252, y = btnY, an = 4, w = 80, h = 2}
     lo.layer = 13
     lo.style = osc_styles.VolumebarBg
     lo.alpha[1] = 153
 
     lo = add_layout("volumebar")
-    lo.geometry = {x = 252, y = refY - 28, an = 4, w = 80, h = 8}
+    lo.geometry = {x = 252, y = btnY, an = 4, w = 80, h = 8}
     lo.style = osc_styles.VolumebarFg
     lo.slider.gap = 3
     lo.slider.tooltip_style = osc_styles.Tooltip
@@ -1211,52 +1213,52 @@ function layouts()
 
     -- buttons
     lo = add_layout("pl_prev")
-    lo.geometry = {x = 28, y = refY - 28, an = 5, w = 40, h = 56}
+    lo.geometry = {x = 28, y = btnY, an = 5, w = btnW, h = btnH}
     lo.style = osc_styles.Ctrl2
 
     lo = add_layout("skipback")
-    lo.geometry = {x = 68, y = refY - 28, an = 5, w = 40, h = 56}
+    lo.geometry = {x = 68, y = btnY, an = 5, w = btnW, h = btnH}
     lo.style = osc_styles.Ctrl2
 
     lo = add_layout("playpause")
-    lo.geometry = {x = 108, y = refY - 28, an = 5, w = 40, h = 56}
+    lo.geometry = {x = 108, y = btnY, an = 5, w = btnW, h = btnH}
     lo.style = osc_styles.Ctrl2
 
     lo = add_layout("skipfrwd")
-    lo.geometry = {x = 148, y = refY - 28, an = 5, w = 40, h = 56}
+    lo.geometry = {x = 148, y = btnY, an = 5, w = btnW, h = btnH}
     lo.style = osc_styles.Ctrl2
 
     lo = add_layout("pl_next")
-    lo.geometry = {x = 188, y = refY - 28, an = 5, w = 40, h = 56}
+    lo.geometry = {x = 188, y = btnY, an = 5, w = btnW, h = btnH}
     lo.style = osc_styles.Ctrl2
 
     -- Timecode
     lo = add_layout("tc_both")
-    lo.geometry = {x = 348, y = refY - 28, an = 4, w = tcW, h = 56}
+    lo.geometry = {x = 348, y = btnY, an = 4, w = tcW, h = btnH}
     lo.style = osc_styles.Time
 
     lo = add_layout("cy_audio")
-    lo.geometry = {x = osc_geo.w - 108, y = refY - 28, an = 5, w = 40, h = 56}
+    lo.geometry = {x = osc_geo.w - 108, y = btnY, an = 5, w = btnW, h = btnH}
     lo.style = osc_styles.Ctrl3
     lo.visible = (osc_param.playresx >= 540)
 
     lo = add_layout("cy_sub")
-    lo.geometry = {x = osc_geo.w - 148, y = refY - 28, an = 5, w = 40, h = 56}
+    lo.geometry = {x = osc_geo.w - 148, y = btnY, an = 5, w = btnW, h = btnH}
     lo.style = osc_styles.Ctrl3
     lo.visible = (osc_param.playresx >= 600)
 
     lo = add_layout("volume")
-    lo.geometry = {x = 228, y = refY - 28, an = 5, w = 40, h = 56}
+    lo.geometry = {x = 228, y = btnY, an = 5, w = btnW, h = btnH}
     lo.style = osc_styles.Ctrl3
     lo.visible = (osc_param.playresx >= 650)
 
     lo = add_layout("tog_fs")
-    lo.geometry = {x = osc_geo.w - 28, y = refY - 28, an = 5, w = 40, h = 56}
+    lo.geometry = {x = osc_geo.w - 28, y = btnY, an = 5, w = btnW, h = btnH}
     lo.style = osc_styles.Ctrl3
     lo.visible = (osc_param.playresx >= 540)
 
     lo = add_layout("tog_info")
-    lo.geometry = {x = osc_geo.w - 68, y = refY - 28, an = 5, w = 40, h = 56}
+    lo.geometry = {x = osc_geo.w - 68, y = btnY, an = 5, w = btnW, h = btnH}
     lo.style = osc_styles.Ctrl3
     lo.visible = (osc_param.playresx >= 600)
 
