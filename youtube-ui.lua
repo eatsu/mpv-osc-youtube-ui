@@ -41,7 +41,7 @@ local user_opts = {
     livemarkers = true,         -- update seekbar chapter markers on duration change
     unicodeminus = false,       -- whether to use the Unicode minus sign character
     volumecontrol = true,       -- whether to show mute button and volumne slider
-    processvolume = true,		-- volue slider show processd volume
+    processvolume = false,		-- volue slider show processd volume
     language = "eng",           -- eng=English, chs=Chinese
     thumbpad = 4,               -- thumbnail border size
 }
