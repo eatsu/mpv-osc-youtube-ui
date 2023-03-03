@@ -34,6 +34,7 @@ local user_opts = {
     showtitle = true,           -- show title and no hide timeout on pause
     timetotal = true,           -- display total time instead of remaining time?
     timems = false,             -- display timecodes with milliseconds?
+    tcspace = 100,              -- timecode spacing (compensate font size estimation)
     visibility = "auto",        -- only used at init to set visibility_mode(...)
     boxvideo = false,           -- apply osc_param.video_margins to video
     windowcontrols = "auto",    -- whether to show window controls
@@ -1152,6 +1153,10 @@ function layouts()
     local btnW = 40
     local btnH = 56
     local tcW = (state.tc_ms) and 180 or 128
+    if user_opts.tcspace >= 50 and user_opts.tcspace <= 200 then
+        -- adjust our hardcoded font size estimation
+        tcW = tcW * user_opts.tcspace / 100
+    end
 
     osc_param.areas = {} -- delete areas
 
