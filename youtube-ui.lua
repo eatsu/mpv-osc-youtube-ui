@@ -36,6 +36,7 @@ local user_opts = {
     visibility = "auto",        -- only used at init to set visibility_mode(...)
     boxvideo = false,           -- apply osc_param.video_margins to video
     windowcontrols = "auto",    -- whether to show window controls
+    windowcontrols_alignment = "right", -- which side to show window controls on
     livemarkers = true,         -- update seekbar chapter markers on duration change
     volumecontrol = true,       -- whether to show mute button and volumne slider
     processvolume = true,		-- volue slider show processd volume
@@ -475,6 +476,10 @@ function window_controls_enabled()
     else
         return val ~= "no"
     end
+end
+
+function window_controls_alignment()
+    return user_opts.windowcontrols_alignment
 end
 
 --
@@ -1049,6 +1054,7 @@ function window_controls()
         h = 32,
     }
 
+    local alignment = window_controls_alignment()
     local controlbox_w = window_control_box_width
     local titlebox_w = wc_geo.w - controlbox_w
 
@@ -1056,6 +1062,12 @@ function window_controls()
     local controlbox_left = wc_geo.w - controlbox_w
     local titlebox_left = wc_geo.x
     local titlebox_right = wc_geo.w - controlbox_w
+
+    if alignment == "left" then
+        controlbox_left = wc_geo.x
+        titlebox_left = wc_geo.x + controlbox_w
+        titlebox_right = wc_geo.w
+    end
 
     add_area("window-controls",
              get_hitbox_coords(controlbox_left, wc_geo.y, wc_geo.an,
@@ -1083,7 +1095,7 @@ function window_controls()
     ne.eventresponder["mbtn_left_up"] =
         function () mp.commandv("quit") end
     lo = add_layout("close")
-    lo.geometry = third_geo
+    lo.geometry = alignment == "left" and first_geo or third_geo
     lo.style = osc_styles.WinCtrl
     lo.alpha[3] = 0
 
@@ -1093,7 +1105,7 @@ function window_controls()
     ne.eventresponder["mbtn_left_up"] =
         function () mp.commandv("cycle", "window-minimized") end
     lo = add_layout("minimize")
-    lo.geometry = first_geo
+    lo.geometry = alignment == "left" and second_geo or first_geo
     lo.style = osc_styles.WinCtrl
     lo.alpha[3] = 0
 
@@ -1113,7 +1125,7 @@ function window_controls()
             end
         end
     lo = add_layout("maximize")
-    lo.geometry = second_geo
+    lo.geometry = alignment == "left" and third_geo or second_geo
     lo.style = osc_styles.WinCtrl
     lo.alpha[3] = 0
 end
@@ -1261,6 +1273,12 @@ function validate_user_opts()
         msg.warn("windowcontrols cannot be \"" ..
                 user_opts.windowcontrols .. "\". Ignoring.")
         user_opts.windowcontrols = "auto"
+    end
+    if user_opts.windowcontrols_alignment ~= "right" and
+       user_opts.windowcontrols_alignment ~= "left" then
+        msg.warn("windowcontrols_alignment cannot be \"" ..
+                user_opts.windowcontrols_alignment .. "\". Ignoring.")
+        user_opts.windowcontrols_alignment = "right"
     end
 end
 
