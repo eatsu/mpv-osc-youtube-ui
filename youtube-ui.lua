@@ -33,6 +33,7 @@ local user_opts = {
                                 -- to be shown as OSC title
     showtitle = true,           -- show title and no hide timeout on pause
     timetotal = true,           -- display total time instead of remaining time?
+    timems = false,             -- display timecodes with milliseconds?
     visibility = "auto",        -- only used at init to set visibility_mode(...)
     boxvideo = false,           -- apply osc_param.video_margins to video
     windowcontrols = "auto",    -- whether to show window controls
@@ -123,6 +124,7 @@ local state = {
     active_element = nil,                   -- nil = none, 0 = background, 1+ = see elements[]
     active_event_source = nil,              -- the "button" that issued the current event
     rightTC_trem = not user_opts.timetotal, -- if the right timecode should display total or remaining time
+    tc_ms = user_opts.timems,               -- Should the timecodes display their time with milliseconds
     mp_screen_sizeX, mp_screen_sizeY,       -- last screen-resolution, to detect resolution changes to issue reINITs
     initREQ = false,                        -- is a re-init request pending?
     marginsREQ = false,                     -- is a margins update pending?
@@ -1146,6 +1148,8 @@ function layouts()
     local posX = 0
     local posY = osc_param.playresy
 
+    local tcW = (state.tc_ms) and 180 or 128
+
     osc_param.areas = {} -- delete areas
 
     -- area for active mouse input
@@ -1228,7 +1232,7 @@ function layouts()
 
     -- Timecode
     lo = add_layout("tc_both")
-    lo.geometry = {x = 348, y = refY - 28, an = 4, w = 128, h = 56}
+    lo.geometry = {x = 348, y = refY - 28, an = 4, w = tcW, h = 56}
     lo.style = osc_styles.Time
 
     lo = add_layout("cy_audio")
@@ -1698,13 +1702,25 @@ function osc_init()
     ne.content = function ()
         if (state.rightTC_trem) then
             local minus = user_opts.unicodeminus and UNICODE_MINUS or "-"
-            return (mp.get_property_osd("playback-time").." / "..minus..mp.get_property_osd("playtime-remaining"))
+            if state.tc_ms then
+                return (mp.get_property_osd("playback-time/full").." / "..minus..mp.get_property_osd("playtime-remaining/full"))
+            else
+                return (mp.get_property_osd("playback-time").." / "..minus..mp.get_property_osd("playtime-remaining"))
+            end
         else
-            return (mp.get_property_osd("playback-time").." / "..mp.get_property_osd("duration"))
+            if state.tc_ms then
+                return (mp.get_property_osd("playback-time/full").." / "..mp.get_property_osd("duration/full"))
+            else
+                return (mp.get_property_osd("playback-time").." / "..mp.get_property_osd("duration"))
+            end
         end
     end
     ne.eventresponder["mbtn_left_up"] =
         function () state.rightTC_trem = not state.rightTC_trem end
+    ne.eventresponder["mbtn_right_up"] = function ()
+        state.tc_ms = not state.tc_ms
+        request_init()
+    end
 
     -- load layout
     layouts()
