@@ -8,6 +8,34 @@ import subprocess
 import os
 import sys
 
+icons = [
+	'play',
+	'pause',
+	# 'close',
+	# 'minimize',
+	# 'maximize_enter',
+	# 'maximize_exit',
+	'fs_enter',
+	'fs_exit',
+	# 'ch_prev',
+	# 'ch_next',
+	'info',
+	'cy_audio',
+	'cy_sub',
+	# 'pip_enter',
+	# 'pip_exit',
+	'pl_prev',
+	'pl_next',
+	'skipback',
+	'skipfrwd',
+	# 'speed',
+	'volume_low',
+	'volume_medium',
+	'volume_high',
+	'volume_over',
+	'volume_mute',
+]
+
 canvasSizePattern = re.compile(r'    \<canvas id=\'canvas\' width=\'(-?\d+(\.\d+)?)\' height=\'(-?\d+(\.\d+)?)\'\>\<\/canvas\>')
 transformPattern = re.compile(r'\tctx.transform\(.+')
 moveToPattern = re.compile(r'\tctx.moveTo\((-?\d+\.\d+), (-?\d+\.\d+)\);')
@@ -96,29 +124,8 @@ def genIconPath(name):
 	os.remove(htmlFilepath)
 
 print('local icons = {')
-genIconPath('play')
-genIconPath('pause')
-# genIconPath('close')
-# genIconPath('minimize')
-# genIconPath('maximize_enter')
-# genIconPath('maximize_exit')
-genIconPath('fs_enter')
-genIconPath('fs_exit')
-# genIconPath('ch_prev')
-# genIconPath('ch_next')
-genIconPath('info')
-genIconPath('cy_audio')
-genIconPath('cy_sub')
-# genIconPath('pip_enter')
-# genIconPath('pip_exit')
-genIconPath('pl_prev')
-genIconPath('pl_next')
-genIconPath('skipback')
-genIconPath('skipfrwd')
-# genIconPath('speed')
-genIconPath('volume_low')
-genIconPath('volume_medium')
-genIconPath('volume_high')
-genIconPath('volume_over')
-genIconPath('volume_mute')
+
+for icon in icons:
+	genIconPath(icon)
+
 print('}')
