@@ -40,6 +40,7 @@ local user_opts = {
     windowcontrols = "auto",    -- whether to show window controls
     windowcontrols_alignment = "right", -- which side to show window controls on
     livemarkers = true,         -- update seekbar chapter markers on duration change
+    chapter_fmt = "Chapter: %s", -- chapter print format for seekbar-hover. "no" to disable
     unicodeminus = false,       -- whether to use the Unicode minus sign character
     volumecontrol = true,       -- whether to show mute button and volumne slider
     processvolume = false,		-- volue slider show processd volume
