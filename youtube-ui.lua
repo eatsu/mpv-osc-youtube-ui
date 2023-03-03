@@ -106,9 +106,7 @@ local osc_styles = {
     SeekbarFg = "{\\blur1\\bord1\\1c&HE39C42&}",
     VolumebarBg = "{\\blur0\\bord0\\1c&HFFFFFF&}",
     VolumebarFg = "{\\blur1\\bord1\\1c&HCCCCCC&}",
-    Ctrl1 = "{\\blur0\\bord0\\1c&HFFFFFF&\\3c&HFFFFFF&\\fs36\\fnmaterial-design-iconic-font}",
-    Ctrl2 = "{\\blur0\\bord0\\1c&HFFFFFF&\\3c&HFFFFFF&\\fs24\\fnmaterial-design-iconic-font}",
-    Ctrl3 = "{\\blur0\\bord0\\1c&HFFFFFF&\\3c&HFFFFFF&\\fs24\\fnmaterial-design-iconic-font}",
+    button = "{\\blur0\\bord0\\1c&HFFFFFF\\3c&HFFFFFF}",
     Time = "{\\blur0\\bord0\\1c&HFFFFFF&\\3c&H000000&\\fs18\\fn" .. user_opts.font .. "}",
     Tooltip = "{\\blur1\\bord0.5\\1c&HFFFFFF&\\3c&H000000&\\fs18\\fn" .. user_opts.font .. "}",
     Title = "{\\blur1\\bord0.5\\1c&HFFFFFF&\\3c&H0\\fs32\\q2\\fn" .. user_opts.font .. "}",
@@ -154,6 +152,25 @@ local state = {
     lastvisibility = user_opts.visibility,		-- save last visibility on pause if showtitle
     sys_volume,									--system volume
     proc_volume,								--processed volume
+}
+
+local icons = {
+    play = "{\\p1}m 0 0 m 24 24 m 8 5 l 8 19 l 19 12{\\p0}",
+    pause = "{\\p1}m 0 0 m 24 24 m 6 19 l 10 19 l 10 5 l 6 5 l 6 19 m 14 5 l 14 19 l 18 19 l 18 5 l 14 5{\\p0}",
+    fs_enter = "{\\p1}m 0 0 m 24 24 m 7 14 l 5 14 l 5 19 l 10 19 l 10 17 l 7 17 l 7 14 m 5 10 l 7 10 l 7 7 l 10 7 l 10 5 l 5 5 l 5 10 m 17 17 l 14 17 l 14 19 l 19 19 l 19 14 l 17 14 l 17 17 m 14 5 l 14 7 l 17 7 l 17 10 l 19 10 l 19 5 l 14 5{\\p0}",
+    fs_exit = "{\\p1}m 0 0 m 24 24 m 5 16 l 8 16 l 8 19 l 10 19 l 10 14 l 5 14 l 5 16 m 8 8 l 5 8 l 5 10 l 10 10 l 10 5 l 8 5 l 8 8 m 14 19 l 16 19 l 16 16 l 19 16 l 19 14 l 14 14 l 14 19 m 16 8 l 16 5 l 14 5 l 14 10 l 19 10 l 19 8 l 16 8{\\p0}",
+    info = "{\\p1}m 0 0 m 24 24 m 11 7 l 13 7 l 13 9 l 11 9 m 11 11 l 13 11 l 13 17 l 11 17 m 12 2 b 6.48 2 2 6.48 2 12 b 2 17.52 6.48 22 12 22 b 17.52 22 22 17.52 22 12 b 22 6.48 17.52 2 12 2 m 12 20 b 7.59 20 4 16.41 4 12 b 4 7.59 7.59 4 12 4 b 16.41 4 20 7.59 20 12 b 20 16.41 16.41 20 12 20{\\p0}",
+    cy_audio = "{\\p1}m 0 0 m 24 24 m 20 4 l 4 4 b 2.9 4 2 4.9 2 6 l 2 18 b 2 19.1 2.9 20 4 20 l 20 20 b 21.1 20 22 19.1 22 18 l 22 6 b 22 4.9 21.1 4 20 4 m 7.76 16.24 l 6.35 17.65 b 4.78 16.1 4 14.05 4 12 b 4 9.95 4.78 7.9 6.34 6.34 l 7.75 7.75 b 6.59 8.93 6 10.46 6 12 b 6 13.54 6.59 15.07 7.76 16.24 m 12 16 b 9.79 16 8 14.21 8 12 b 8 9.79 9.79 8 12 8 b 14.21 8 16 9.79 16 12 b 16 14.21 14.21 16 12 16 m 17.66 17.66 l 16.25 16.25 b 17.41 15.07 18 13.54 18 12 b 18 10.46 17.41 8.93 16.24 7.76 l 17.65 6.35 b 19.22 7.9 20 9.95 20 12 b 20 14.05 19.22 16.1 17.66 17.66 m 12 10 b 10.9 10 10 10.9 10 12 b 10 13.1 10.9 14 12 14 b 13.1 14 14 13.1 14 12 b 14 10.9 13.1 10 12 10{\\p0}",
+    cy_sub = "{\\p1}m 0 0 m 24 24 m 20 4 l 4 4 b 2.9 4 2 4.9 2 6 l 2 18 b 2 19.1 2.9 20 4 20 l 20 20 b 21.1 20 22 19.1 22 18 l 22 6 b 22 4.9 21.1 4 20 4 m 4 12 l 8 12 l 8 14 l 4 14 l 4 12 m 14 18 l 4 18 l 4 16 l 14 16 l 14 18 m 20 18 l 16 18 l 16 16 l 20 16 l 20 18 m 20 14 l 10 14 l 10 12 l 20 12 l 20 14{\\p0}",
+    pl_prev = "{\\p1}m 0 0 m 24 24 m 6 6 l 8 6 l 8 18 l 6 18 m 9.5 12 l 18 18 l 18 6{\\p0}",
+    pl_next = "{\\p1}m 0 0 m 24 24 m 6 18 l 14.5 12 l 6 6 l 6 18 m 16 6 l 16 18 l 18 18 l 18 6 l 16 6{\\p0}",
+    skipback = "{\\p1}m 0 0 m 24 24 m 11 18 l 11 6 l 2.5 12 l 11 18 m 11.5 12 l 20 18 l 20 6 l 11.5 12{\\p0}",
+    skipfrwd = "{\\p1}m 0 0 m 24 24 m 4 18 l 12.5 12 l 4 6 l 4 18 m 13 6 l 13 18 l 21.5 12 l 13 6{\\p0}",
+    volume_low = "{\\p1}m 0 0 m 24 24 m 3 9 l 3 15 l 7 15 l 12 20 l 12 4 l 7 9 l 3 9{\\p0}",
+    volume_medium = "{\\p1}m 0 0 m 24 24 m 14 7.97 l 14 16.02 b 15.48 15.29 16.5 13.77 16.5 12 b 16.5 10.23 15.48 8.71 14 7.97 m 3 9 l 3 15 l 7 15 l 12 20 l 12 4 l 7 9 l 3 9{\\p0}",
+    volume_high = "{\\p1}m 0 0 m 24 24 m 3 9 l 3 15 l 7 15 l 12 20 l 12 4 l 7 9 l 3 9 m 16.5 12 b 16.5 10.23 15.48 8.71 14 7.97 l 14 16.02 b 15.48 15.29 16.5 13.77 16.5 12 m 14 3.23 l 14 5.29 b 16.89 6.15 19 8.83 19 12 b 19 15.17 16.89 17.85 14 18.71 l 14 20.77 b 18.01 19.86 21 16.28 21 12 b 21 7.72 18.01 4.14 14 3.23{\\p0}",
+    volume_over = "{\\p1}m 0 0 m 24 24 m 3 9 l 3 15 l 7 15 l 12 20 l 12 4 l 7 9 l 3 9 m 16 6 l 18 6 l 18 14 l 16 14 m 16 16 l 18 16 l 18 18 l 16 18{\\p0}",
+    volume_mute = "{\\p1}m 0 0 m 24 24 m 16.5 12 b 16.5 10.23 15.48 8.71 14 7.97 l 14 10.18 l 16.45 12.63 b 16.48 12.43 16.5 12.22 16.5 12 m 19 12 b 19 12.94 18.8 13.82 18.46 14.64 l 19.97 16.15 b 20.63 14.91 21 13.5 21 12 b 21 7.72 18.01 4.14 14 3.23 l 14 5.29 b 16.89 6.15 19 8.83 19 12 m 4.27 3 l 3 4.27 l 7.73 9 l 3 9 l 3 15 l 7 15 l 12 20 l 12 13.27 l 16.25 17.52 b 15.58 18.04 14.83 18.45 14 18.7 l 14 20.76 b 15.38 20.45 16.63 19.81 17.69 18.95 l 19.73 21 l 21 19.73 l 12 10.73 l 4.27 3 m 12 4 l 9.91 6.09 l 12 8.18 l 12 4{\\p0}",
 }
 
 local thumbfast = {
@@ -1228,23 +1245,23 @@ function layouts()
     -- buttons
     lo = add_layout("pl_prev")
     lo.geometry = {x = 28, y = btnY, an = 5, w = btnW, h = btnH}
-    lo.style = osc_styles.Ctrl2
+    lo.style = osc_styles.button
 
     lo = add_layout("skipback")
     lo.geometry = {x = 68, y = btnY, an = 5, w = btnW, h = btnH}
-    lo.style = osc_styles.Ctrl2
+    lo.style = osc_styles.button
 
     lo = add_layout("playpause")
     lo.geometry = {x = 108, y = btnY, an = 5, w = btnW, h = btnH}
-    lo.style = osc_styles.Ctrl2
+    lo.style = osc_styles.button
 
     lo = add_layout("skipfrwd")
     lo.geometry = {x = 148, y = btnY, an = 5, w = btnW, h = btnH}
-    lo.style = osc_styles.Ctrl2
+    lo.style = osc_styles.button
 
     lo = add_layout("pl_next")
     lo.geometry = {x = 188, y = btnY, an = 5, w = btnW, h = btnH}
-    lo.style = osc_styles.Ctrl2
+    lo.style = osc_styles.button
 
     -- Timecode
     lo = add_layout("tc_both")
@@ -1253,27 +1270,27 @@ function layouts()
 
     lo = add_layout("cy_audio")
     lo.geometry = {x = osc_geo.w - 108, y = btnY, an = 5, w = btnW, h = btnH}
-    lo.style = osc_styles.Ctrl3
+    lo.style = osc_styles.button
     lo.visible = (osc_param.playresx >= 540)
 
     lo = add_layout("cy_sub")
     lo.geometry = {x = osc_geo.w - 148, y = btnY, an = 5, w = btnW, h = btnH}
-    lo.style = osc_styles.Ctrl3
+    lo.style = osc_styles.button
     lo.visible = (osc_param.playresx >= 600)
 
     lo = add_layout("volume")
     lo.geometry = {x = 228, y = btnY, an = 5, w = btnW, h = btnH}
-    lo.style = osc_styles.Ctrl3
+    lo.style = osc_styles.button
     lo.visible = (osc_param.playresx >= 650)
 
     lo = add_layout("tog_fs")
     lo.geometry = {x = osc_geo.w - 28, y = btnY, an = 5, w = btnW, h = btnH}
-    lo.style = osc_styles.Ctrl3
+    lo.style = osc_styles.button
     lo.visible = (osc_param.playresx >= 540)
 
     lo = add_layout("tog_info")
     lo.geometry = {x = osc_geo.w - 68, y = btnY, an = 5, w = btnW, h = btnH}
-    lo.style = osc_styles.Ctrl3
+    lo.style = osc_styles.button
     lo.visible = (osc_param.playresx >= 600)
 
     -- Title
@@ -1362,7 +1379,7 @@ function osc_init()
     -- prev
     ne = new_element("pl_prev", "button")
 
-    ne.content = "\xEF\x8E\xB5"
+    ne.content = icons.pl_prev
     ne.enabled = (pl_pos > 1) or (loop ~= "no")
     ne.eventresponder["mbtn_left_up"] =
         function ()
@@ -1376,7 +1393,7 @@ function osc_init()
     --next
     ne = new_element("pl_next", "button")
 
-    ne.content = "\xEF\x8E\xB4"
+    ne.content = icons.pl_next
     ne.enabled = (have_pl and (pl_pos < pl_count)) or (loop ~= "no")
     ne.eventresponder["mbtn_left_up"] =
         function ()
@@ -1395,9 +1412,9 @@ function osc_init()
 
     ne.content = function ()
         if mp.get_property("pause") == "yes" then
-            return ("\xEF\x8E\xAA")
+            return icons.play
         else
-            return ("\xEF\x8E\xA7")
+            return icons.pause
         end
     end
     ne.eventresponder["mbtn_left_up"] =
@@ -1409,7 +1426,7 @@ function osc_init()
     ne = new_element("skipback", "button")
 
     ne.softrepeat = true
-    ne.content = "\xEF\x8E\xA0"
+    ne.content = icons.skipback
     ne.eventresponder["mbtn_left_down"] =
         function () mp.commandv("seek", -5, "exact") end
     ne.eventresponder["shift+mbtn_left_down"] =
@@ -1421,7 +1438,7 @@ function osc_init()
     ne = new_element("skipfrwd", "button")
 
     ne.softrepeat = true
-    ne.content = "\xEF\x8E\x9F"
+    ne.content = icons.skipfrwd
     ne.eventresponder["mbtn_left_down"] =
         function () mp.commandv("seek", 5, "exact") end
     ne.eventresponder["shift+mbtn_left_down"] =
@@ -1436,7 +1453,7 @@ function osc_init()
     ne = new_element("cy_audio", "button")
     ne.enabled = (#tracks_osc.audio > 0)
     ne.visible = (osc_param.playresx >= 540)
-    ne.content = "\xEF\x8E\xB7"
+    ne.content = icons.cy_audio
     ne.tooltip_style = osc_styles.Tooltip
     ne.tooltipF = function ()
         local msg = texts.off
@@ -1466,7 +1483,7 @@ function osc_init()
     ne = new_element("cy_sub", "button")
     ne.enabled = (#tracks_osc.sub > 0)
     ne.visible = (osc_param.playresx >= 600)
-    ne.content = "\xEF\x8F\x93"
+    ne.content = icons.cy_sub
     ne.tooltip_style = osc_styles.Tooltip
     ne.tooltipF = function ()
         local msg = texts.off
@@ -1499,10 +1516,10 @@ function osc_init()
     ne.content = function ()
         local volume = mp.get_property_number("volume", 0)
         local mute = mp.get_property_native("mute")
-        local volicon = {"\xEF\x8E\xBA", "\xEF\x8E\xB9",
-                         "\xEF\x8E\xBC", "\xEF\x8E\xBC"}
+        local volicon = {icons.volume_low, icons.volume_medium,
+                         icons.volume_high, icons.volume_over}
         if volume == 0 or mute then
-            return "\xEF\x8E\xBB"
+            return icons.volume_mute
         else
             return volicon[math.min(4,math.ceil(volume / (100/3)))]
         end
@@ -1519,9 +1536,9 @@ function osc_init()
     ne = new_element("tog_fs", "button")
     ne.content = function ()
         if (state.fullscreen) then
-            return ("\xEF\x85\xAC")
+            return icons.fs_exit
         else
-            return ("\xEF\x85\xAD")
+            return icons.fs_enter
         end
     end
     ne.visible = (osc_param.playresx >= 540)
@@ -1530,7 +1547,7 @@ function osc_init()
 
     --tog_info
     ne = new_element("tog_info", "button")
-    ne.content = ""
+    ne.content = icons.info
     ne.visible = (osc_param.playresx >= 600)
     ne.eventresponder["mbtn_left_up"] =
         function () mp.commandv("script-binding", "stats/display-stats-toggle") end
