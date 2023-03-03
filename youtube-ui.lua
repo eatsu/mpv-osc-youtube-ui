@@ -38,6 +38,7 @@ local user_opts = {
     windowcontrols = "auto",    -- whether to show window controls
     windowcontrols_alignment = "right", -- which side to show window controls on
     livemarkers = true,         -- update seekbar chapter markers on duration change
+    unicodeminus = false,       -- whether to use the Unicode minus sign character
     volumecontrol = true,       -- whether to show mute button and volumne slider
     processvolume = true,		-- volue slider show processd volume
     language = "eng",           -- eng=English, chs=Chinese
@@ -1290,6 +1291,8 @@ function update_options(list)
     request_init()
 end
 
+local UNICODE_MINUS = string.char(0xe2, 0x88, 0x92)  -- UTF-8 for U+2212 MINUS SIGN
+
 -- OSC INIT
 function osc_init()
     msg.debug("osc_init")
@@ -1690,10 +1693,12 @@ function osc_init()
 
     -- tc_both (current pos + total/remaining time)
     ne = new_element("tc_both", "button")
+
+    ne.visible = (mp.get_property_number("duration", 0) > 0)
     ne.content = function ()
-        if (mp.get_property_number("duration", 0) <= 0) then return "--:--:--" end
         if (state.rightTC_trem) then
-            return (mp.get_property_osd("playback-time").." / -"..mp.get_property_osd("playtime-remaining"))
+            local minus = user_opts.unicodeminus and UNICODE_MINUS or "-"
+            return (mp.get_property_osd("playback-time").." / "..minus..mp.get_property_osd("playtime-remaining"))
         else
             return (mp.get_property_osd("playback-time").." / "..mp.get_property_osd("duration"))
         end
