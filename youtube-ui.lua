@@ -148,7 +148,6 @@ local state = {
     maximized = false,
     osd = mp.create_osd_overlay("ass-events"),
     chapter_list = {},                      -- sorted by time
-    mute = false,
     lastvisibility = user_opts.visibility,		-- save last visibility on pause if showtitle
     sys_volume,									--system volume
     proc_volume,								--processed volume
@@ -1480,17 +1479,26 @@ function osc_init()
 
     -- volume
     ne = new_element("volume", "button")
-    ne.enabled = (get_track('audio')>0)
+    ne.enabled = (#tracks_osc.audio > 0)
     ne.visible = (osc_param.playresx >= 650) and user_opts.volumecontrol
     ne.content = function ()
-        if (state.mute) then
-            return ('\xEF\x8E\xBB')
+        local volume = mp.get_property_number("volume", 0)
+        local mute = mp.get_property_native("mute")
+        local volicon = {"\xEF\x8E\xBA", "\xEF\x8E\xB9",
+                         "\xEF\x8E\xBC", "\xEF\x8E\xBC"}
+        if volume == 0 or mute then
+            return "\xEF\x8E\xBB"
         else
-            return ('\xEF\x8E\xBC')
+            return volicon[math.min(4,math.ceil(volume / (100/3)))]
         end
     end
     ne.eventresponder["mbtn_left_up"] =
         function () mp.commandv("cycle", "mute") end
+
+    ne.eventresponder["wheel_up_press"] =
+        function () mp.commandv("osd-auto", "add", "volume", 5) end
+    ne.eventresponder["wheel_down_press"] =
+        function () mp.commandv("osd-auto", "add", "volume", -5) end
 
     --tog_fs
     ne = new_element("tog_fs", "button")
@@ -1647,9 +1655,9 @@ function osc_init()
         function (element) element.state.lastseek = nil end
 
     --volumebar
-    ne = new_element('volumebar', 'slider')
+    ne = new_element("volumebar", "slider")
     ne.visible = (osc_param.playresx >= 700) and user_opts.volumecontrol
-    ne.enabled = (get_track('audio')>0)
+    ne.enabled = (#tracks_osc.audio > 0)
     ne.slider.tooltipF =
 		function (pos)
 			local refpos = state.proc_volume
@@ -2328,11 +2336,6 @@ mp.observe_property("fullscreen", "bool",
         state.fullscreen = val
         state.marginsREQ = true
         request_init_resize()
-    end
-)
-mp.observe_property('mute', 'bool',
-    function(name, val)
-        state.mute = val
     end
 )
 mp.observe_property('volume', 'number',
