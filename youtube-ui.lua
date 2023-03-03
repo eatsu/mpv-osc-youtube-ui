@@ -20,6 +20,7 @@ local user_opts = {
                                 -- mouse movement. enforced non-negative for the
                                 -- user, but internally negative is "always-on".
     fadeduration = 150,         -- duration of fade out in ms, 0 = no fade
+    deadzonesize = 0,           -- size of deadzone
     minmousemove = 0,           -- minimum amount of pixels the mouse has to
                                 -- move between ticks to make the OSC show up
     iamaprogrammer = false,     -- use native mpv values and disable OSC
@@ -1132,6 +1133,12 @@ function window_controls()
     lo.geometry = alignment == "left" and third_geo or second_geo
     lo.style = osc_styles.WinCtrl
     lo.alpha[3] = 0
+
+    -- deadzone below window controls
+    local sh_area_y0, sh_area_y1
+    sh_area_y0 = 0
+    sh_area_y1 = osc_param.playresy * (1 - user_opts.deadzonesize)
+    add_area("showhide_wc", wc_geo.x, sh_area_y0, wc_geo.w, sh_area_y1)
 end
 
 --
@@ -1165,9 +1172,11 @@ function layouts()
     add_area("input", get_hitbox_coords(osc_geo.x, osc_geo.y, osc_geo.an,
                                         osc_geo.w, osc_geo.h))
 
-    -- area for show/hide
-    add_area("showhide", 0, 0, osc_param.playresx, osc_param.playresy)
-    add_area("showhide_wc", 0, 0, osc_param.playresx, osc_param.playresy)
+    -- deadzone above OSC
+    local sh_area_y0, sh_area_y1
+    sh_area_y0 = osc_param.playresy * user_opts.deadzonesize
+    sh_area_y1 = osc_param.playresy
+    add_area("showhide", 0, sh_area_y0, osc_param.playresx, sh_area_y1)
 
     local lo, geo
 
