@@ -387,15 +387,6 @@ function ass_draw_rr_h_ccw(ass, x0, y0, x1, y1, r1, hexagon, r2)
     end
 end
 
--- set volume
-function set_volume(val)
-	if user_opts.processvolume then
-		val = 10*math.sqrt(val)
-	end
-	mp.commandv('set', 'volume', val)
-	mp.commandv('add', 'volume', 0)		--this prevent volume exceeds limit
-end
-
 
 --
 -- Tracklist Management
@@ -1524,13 +1515,22 @@ function osc_init()
             return volicon[math.min(4,math.ceil(volume / (100/3)))]
         end
     end
+    ne.tooltip_style = osc_styles.Tooltip
+    ne.tooltipF = function ()
+        local mute = mp.get_property_native("mute")
+        if mute then
+            return "Unmute"
+        else
+            return "Mute"
+        end
+    end
     ne.eventresponder["mbtn_left_up"] =
         function () mp.commandv("cycle", "mute") end
 
     ne.eventresponder["wheel_up_press"] =
-        function () mp.commandv("osd-auto", "add", "volume", 5) end
+        function () mp.commandv("osd-msg", "add", "volume", 5) end
     ne.eventresponder["wheel_down_press"] =
-        function () mp.commandv("osd-auto", "add", "volume", -5) end
+        function () mp.commandv("osd-msg", "add", "volume", -5) end
 
     --tog_fs
     ne = new_element("tog_fs", "button")
@@ -1691,51 +1691,33 @@ function osc_init()
     ne.visible = (osc_param.playresx >= 700) and user_opts.volumecontrol
     ne.enabled = (#tracks_osc.audio > 0)
     ne.slider.tooltipF =
-		function (pos)
-			local refpos = state.proc_volume
-			if refpos > 100 then refpos = 100 end
-			if pos+3 >= refpos and pos-3 <= refpos then
-				return string.format('%d', state.proc_volume)
-			else
-				return ''
-			end
-		end
+        function ()
+            return "Volume"
+        end
     ne.slider.markerF = nil
     ne.slider.seekRangesF = nil
     ne.slider.posF =
         function ()
             return state.proc_volume
         end
-    ne.eventresponder['mouse_move'] =
+    ne.eventresponder["mouse_move"] = --volume seeking when mouse is dragged
         function (element)
-            if not element.state.mbtnleft then return end
             local seekto = get_slider_value(element)
             if (element.state.lastseek == nil) or
                 (not (element.state.lastseek == seekto)) then
-                    set_volume(seekto)
+                    mp.commandv("osd-msg", "set", "volume", seekto)
                     element.state.lastseek = seekto
             end
         end
-    ne.eventresponder['mbtn_left_down'] = --exact seeks on single clicks
-        function (element)
-            local seekto = get_slider_value(element)
-            set_volume(seekto)
-            element.state.mbtnleft = true
-        end
-    ne.eventresponder['mbtn_left_up'] =
-        function (element)
-			element.state.mbtnleft = false
-		end
-    ne.eventresponder['reset'] =
+    ne.eventresponder["mbtn_left_down"] = --exact seeks on single clicks
+        function (element) mp.commandv("osd-msg", "set", "volume",
+            get_slider_value(element)) end
+    ne.eventresponder["reset"] =
         function (element) element.state.lastseek = nil end
-    ne.eventresponder['wheel_up_press'] =
-        function (element)
-			set_volume(state.proc_volume+5)
-		end
-    ne.eventresponder['wheel_down_press'] =
-        function (element)
-			set_volume(state.proc_volume-5)
-		end
+    ne.eventresponder["wheel_up_press"] =
+        function () mp.commandv("osd-msg", "add", "volume", 5) end
+    ne.eventresponder["wheel_down_press"] =
+        function () mp.commandv("osd-msg", "add", "volume", -5) end
 
     -- tc_both (current pos + total/remaining time)
     ne = new_element("tc_both", "button")
