@@ -26,7 +26,6 @@ local user_opts = {
     iamaprogrammer = false,     -- use native mpv values and disable OSC
                                 -- internal track list management (and some
                                 -- functions that depend on it)
-    font = "mpv-osd-symbols",   -- default osc font
     seekrange = true,           -- show seekrange overlay
     seekrangealpha = 128,       -- transparency of seekranges
     seekbarkeyframes = true,    -- use keyframes when dragging the seekbar
@@ -105,10 +104,10 @@ local osc_styles = {
     VolumebarBg = "{\\blur0\\bord0\\1c&HFFFFFF&}",
     VolumebarFg = "{\\blur1\\bord1\\1c&HCCCCCC&}",
     button = "{\\blur0\\bord0\\1c&HFFFFFF\\3c&HFFFFFF}",
-    Time = "{\\blur0\\bord0\\1c&HFFFFFF&\\3c&H000000&\\fs18\\fn" .. user_opts.font .. "}",
-    Tooltip = "{\\blur1\\bord0.5\\1c&HFFFFFF&\\3c&H000000&\\fs18\\fn" .. user_opts.font .. "}",
+    Time = "{\\blur0\\bord0\\1c&HFFFFFF&\\3c&H000000&\\fs18}",
+    Tooltip = "{\\blur1\\bord0.5\\1c&HFFFFFF&\\3c&H000000&\\fs18}",
     Title = "{\\1c&HFFFFFF\\fs24}",
-    WinCtrl = "{\\blur1\\bord0.5\\1c&HFFFFFF&\\3c&H0\\fs20\\fnmpv-osd-symbols}",
+    WinCtrl = "{\\blur1\\bord0.5\\1c&HFFFFFF&\\3c&H0\\fs20}",
     elementDown = "{\\1c&H999999&}",
 }
 
