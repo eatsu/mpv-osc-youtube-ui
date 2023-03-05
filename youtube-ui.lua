@@ -44,7 +44,6 @@ local user_opts = {
     chapter_fmt = "Chapter: %s", -- chapter print format for seekbar-hover. "no" to disable
     unicodeminus = false,       -- whether to use the Unicode minus sign character
     volumecontrol = true,       -- whether to show mute button and volumne slider
-    processvolume = false,		-- volue slider show processd volume
     language = "eng",           -- eng=English, chs=Chinese
     thumbpad = 4,               -- thumbnail border size
 }
@@ -150,8 +149,7 @@ local state = {
     osd = mp.create_osd_overlay("ass-events"),
     chapter_list = {},                      -- sorted by time
     lastvisibility = user_opts.visibility,		-- save last visibility on pause if showtitle
-    sys_volume,									--system volume
-    proc_volume,								--processed volume
+    volume,
 }
 
 local icons = {
@@ -1698,7 +1696,7 @@ function osc_init()
     ne.slider.seekRangesF = nil
     ne.slider.posF =
         function ()
-            return state.proc_volume
+            return state.volume
         end
     ne.eventresponder["mouse_move"] = --volume seeking when mouse is dragged
         function (element)
@@ -2352,14 +2350,9 @@ mp.observe_property("fullscreen", "bool",
         request_init_resize()
     end
 )
-mp.observe_property('volume', 'number',
+mp.observe_property("volume", "number",
 	function(name, val)
-		state.sys_volume = val
-		if user_opts.processvolume then
-			state.proc_volume = val*val/100
-		else
-			state.proc_volume = val
-		end
+		state.volume = val
 	end
 )
 mp.observe_property("border", "bool",
