@@ -1478,7 +1478,7 @@ function osc_init()
 
     --cy_audio
     ne = new_element("cy_audio", "button")
-    ne.enabled = (#tracks_osc.audio > 0)
+    ne.enabled = (#tracks_osc.audio > 1)
     ne.visible = (osc_param.playresx >= 540)
     ne.content = icons.cy_audio
     ne.tooltip_style = osc_styles.Tooltip
