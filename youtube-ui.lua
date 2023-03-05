@@ -148,7 +148,7 @@ local state = {
     maximized = false,
     osd = mp.create_osd_overlay("ass-events"),
     chapter_list = {},                      -- sorted by time
-    lastvisibility = user_opts.visibility,		-- save last visibility on pause if showtitle
+    last_visibility = user_opts.visibility, -- last visibility on pause
     volume,
 }
 
@@ -1865,14 +1865,10 @@ end
 
 function pause_state(name, enabled)
     state.paused = enabled
-    if user_opts.showtitle then
-        if enabled then
-            state.lastvisibility = user_opts.visibility
-            visibility_mode('always', true)
-            show_osc()
-        else
-            visibility_mode(state.lastvisibility, true)
-        end
+    if state.paused then
+        visibility_mode("always", true)
+    else
+        visibility_mode(state.last_visibility, true)
     end
     request_tick()
 end
