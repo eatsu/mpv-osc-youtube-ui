@@ -32,7 +32,6 @@ local user_opts = {
     seekbarkeyframes = true,    -- use keyframes when dragging the seekbar
     title = "${media-title}",   -- string compatible with property-expansion
                                 -- to be shown as OSC title
-    showtitle = true,           -- show title and no hide timeout on pause
     timetotal = true,           -- display total time instead of remaining time?
     timems = false,             -- display timecodes with milliseconds?
     tcspace = 100,              -- timecode spacing (compensate font size estimation)
@@ -108,7 +107,7 @@ local osc_styles = {
     button = "{\\blur0\\bord0\\1c&HFFFFFF\\3c&HFFFFFF}",
     Time = "{\\blur0\\bord0\\1c&HFFFFFF&\\3c&H000000&\\fs18\\fn" .. user_opts.font .. "}",
     Tooltip = "{\\blur1\\bord0.5\\1c&HFFFFFF&\\3c&H000000&\\fs18\\fn" .. user_opts.font .. "}",
-    Title = "{\\blur1\\bord0.5\\1c&HFFFFFF&\\3c&H0\\fs32\\q2\\fn" .. user_opts.font .. "}",
+    Title = "{\\1c&HFFFFFF\\fs24}",
     WinCtrl = "{\\blur1\\bord0.5\\1c&HFFFFFF&\\3c&H0\\fs20\\fnmpv-osd-symbols}",
     elementDown = "{\\1c&H999999&}",
 }
@@ -1086,6 +1085,21 @@ function window_controls()
 
     local lo
 
+    -- Background Bar
+    new_element("wcbar", "box")
+    lo = add_layout("wcbar")
+    lo.geometry = {
+        x = wc_geo.x - 200,
+        y = 0,
+        an = 4,
+        w = wc_geo.w + 400,
+        h = 160,
+    }
+    lo.layer = 10
+    lo.style = osc_styles.box
+    lo.alpha[1] = 0
+    lo.alpha[3] = 0
+
     local button_y = wc_geo.y - (wc_geo.h / 2)
     local first_geo =
         {x = controlbox_left + 27, y = button_y, an = 5, w = 40, h = wc_geo.h}
@@ -1145,6 +1159,28 @@ function window_controls()
     sh_area_y0 = 0
     sh_area_y1 = osc_param.playresy * (1 - user_opts.deadzonesize)
     add_area("showhide_wc", wc_geo.x, sh_area_y0, wc_geo.w, sh_area_y1)
+
+    -- Window Title
+    ne = new_element("wctitle", "button")
+    ne.content = function ()
+        local title = mp.command_native({"expand-text", user_opts.title})
+        -- escape ASS, and strip newlines and trailing slashes
+        title = title:gsub("\\n", " "):gsub("\\$", ""):gsub("{","\\{")
+        return not (title == "") and title or "mpv"
+    end
+    local left_pad = 16
+    local right_pad = 8
+    lo = add_layout("wctitle")
+    lo.geometry =
+        { x = titlebox_left + left_pad, y = wc_geo.y, an = 1,
+          w = titlebox_w, h = wc_geo.h }
+    lo.style = string.format("%s{\\clip(%f,%f,%f,%f)}",
+        osc_styles.Title,
+        titlebox_left + left_pad, wc_geo.y - wc_geo.h,
+        titlebox_right - right_pad , wc_geo.y + wc_geo.h)
+
+    add_area("window-controls-title",
+             titlebox_left, 0, titlebox_right, wc_geo.h)
 end
 
 --
@@ -1563,7 +1599,7 @@ function osc_init()
         end
         return not (title == "") and title or "mpv"
     end
-    ne.visible = osc_param.playresy >= 320 and user_opts.showtitle
+    ne.visible = false
 
     --seekbar
     ne = new_element("seekbar", "slider")
