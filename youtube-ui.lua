@@ -757,6 +757,10 @@ function render_elements(master_ass)
                             an = an - 1
                             tx = tx + 10
                         end
+                    else
+                        -- for volumebar
+                        tx = element.hitbox.x1 + elem_geo.w / 2
+                        ty = ty - 10
                     end
 
                     -- tooltip label
@@ -845,9 +849,9 @@ function render_elements(master_ass)
             if not (element.tooltipF == nil) and element.enabled then
                 if mouse_hit(element) then
                     local tooltiplabel = element.tooltipF
-                    local an = 1
-                    local ty = element.hitbox.y1
-                    local tx = get_virt_mouse_pos()
+                    local an = 2
+                    local ty = element.hitbox.y1 + 12
+                    local tx = (element.hitbox.x1 + element.hitbox.x2) / 2
 
                     if ty < osc_param.playresy / 2 then
                         ty = element.hitbox.y2
@@ -1248,7 +1252,6 @@ function layouts()
     lo.style = osc_styles.SeekbarFg
     lo.slider.gap = 7
     lo.slider.tooltip_style = osc_styles.Tooltip
-    lo.slider.tooltip_an = 2
 
     -- Volumebar
     lo = new_element("volumebarbg", "box")
@@ -1264,7 +1267,7 @@ function layouts()
     lo.style = osc_styles.VolumebarFg
     lo.slider.gap = 3
     lo.slider.tooltip_style = osc_styles.Tooltip
-    lo.slider.tooltip_an = 2
+    lo.slider.adjust_tooltip = false
 
     -- buttons
     lo = add_layout("pl_prev")
