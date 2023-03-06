@@ -1679,9 +1679,9 @@ function osc_init()
 					end
 				end
 				if ch == 0 then
-					return string.format('[%s] [0/%d]', mp.format_time(possec), #chapters)
+					return mp.format_time(possec)
 				elseif chapters[ch].title then
-					return string.format('[%s] [%d/%d][%s]', mp.format_time(possec), ch, #chapters, chapters[ch].title)
+					return mp.format_time(possec) .. " • " .. chapters[ch].title
 				end
 			end
             return mp.format_time(possec)
