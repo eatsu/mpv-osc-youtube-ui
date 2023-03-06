@@ -102,13 +102,12 @@ local osc_styles = {
     SeekbarBg = "{\\blur0\\bord0\\1c&HFFFFFF&}",
     SeekbarFg = "{\\blur1\\bord1\\1c&HE39C42&}",
     VolumebarBg = "{\\blur0\\bord0\\1c&HFFFFFF&}",
-    VolumebarFg = "{\\blur1\\bord1\\1c&HCCCCCC&}",
+    VolumebarFg = "{\\blur0\\bord0\\1c&HFFFFFF&}",
     button = "{\\blur0\\bord0\\1c&HFFFFFF\\3c&HFFFFFF}",
     Time = "{\\blur0\\bord0\\1c&HFFFFFF&\\3c&H000000&\\fs18}",
     Tooltip = "{\\blur1\\bord0.5\\1c&HFFFFFF&\\3c&H000000&\\fs18}",
     Title = "{\\1c&HFFFFFF\\fs24}",
     WinCtrl = "{\\blur1\\bord0.5\\1c&HFFFFFF&\\3c&H0\\fs20}",
-    elementDown = "{\\1c&H999999&}",
 }
 
 -- internal states, do not touch
@@ -611,7 +610,7 @@ function prepare_elements()
         -- if the element is supposed to be disabled,
         -- style it accordingly and kill the eventresponders
         if not (element.enabled) then
-            element.layout.alpha[1] = 136
+            element.layout.alpha[1] = 153
             element.eventresponder = nil
         end
     end
@@ -668,7 +667,7 @@ function render_elements(master_ass)
             if mouse_hit(element) then
                 -- mouse down styling
                 if (element.styledown) then
-                    style_ass:append(osc_styles.elementDown)
+                    ass_append_alpha(style_ass, element.layout.alpha, 102)
                 end
 
                 if (element.softrepeat) and (state.mouse_down_counter >= 15
@@ -720,6 +719,14 @@ function render_elements(master_ass)
                     local pstart = get_slider_ele_pos_for(element, range["start"])
                     local pend = get_slider_ele_pos_for(element, range["end"])
                     elem_ass:rect_cw(pstart - rh, slider_lo.gap, pend + rh, elem_geo.h - slider_lo.gap)
+                end
+            end
+
+            if element.enabled and not (slider_lo.adjust_tooltip) then
+                if mouse_hit(element) then
+                    element.layout.alpha[1] = 0
+                else
+                    element.layout.alpha[1] = 51
                 end
             end
 
@@ -834,13 +841,12 @@ function render_elements(master_ass)
                 end
             end
 
-            -- FIXME: properly implement the hover/pressed states
-            if not element.enabled then
-                element.layout.alpha[1] = 153
-            elseif not mouse_hit(element) then
-                element.layout.alpha[1] = 51
-            else
-                element.layout.alpha[1] = 0
+            if element.enabled then
+                if mouse_hit(element) then
+                    element.layout.alpha[1] = 0
+                else
+                    element.layout.alpha[1] = 51
+                end
             end
 
             elem_ass:append(buttontext)
@@ -1255,7 +1261,7 @@ function layouts()
 
     -- Volumebar
     lo = new_element("volumebarbg", "box")
-    lo.visible = (osc_param.playresx >= 750) and user_opts.volumecontrol
+    lo.visible = (osc_param.playresx >= 750) and user_opts.volumecontrol and (#tracks_osc.audio > 0)
     lo = add_layout("volumebarbg")
     lo.geometry = {x = 252, y = btnY, an = 4, w = 80, h = 2}
     lo.layer = 13
