@@ -146,7 +146,6 @@ local state = {
     osd = mp.create_osd_overlay("ass-events"),
     chapter_list = {},                      -- sorted by time
     last_visibility = user_opts.visibility, -- last visibility on pause
-    volume,
 }
 
 local icons = {
@@ -1739,9 +1738,7 @@ function osc_init()
     ne.slider.markerF = nil
     ne.slider.seekRangesF = nil
     ne.slider.posF =
-        function ()
-            return state.volume
-        end
+        function () return mp.get_property_number("volume", 0) end
     ne.eventresponder["mouse_move"] = --volume seeking when mouse is dragged
         function (element)
             local seekto = get_slider_value(element)
@@ -2389,11 +2386,6 @@ mp.observe_property("fullscreen", "bool",
         state.marginsREQ = true
         request_init_resize()
     end
-)
-mp.observe_property("volume", "number",
-	function(name, val)
-		state.volume = val
-	end
 )
 mp.observe_property("border", "bool",
     function(name, val)
