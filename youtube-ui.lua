@@ -33,7 +33,6 @@ local user_opts = {
                                 -- to be shown as OSC title
     timetotal = true,           -- display total time instead of remaining time?
     timems = false,             -- display timecodes with milliseconds?
-    tcspace = 100,              -- timecode spacing (compensate font size estimation)
     visibility = "auto",        -- only used at init to set visibility_mode(...)
     boxvideo = false,           -- apply osc_param.video_margins to video
     windowcontrols = "auto",    -- whether to show window controls
@@ -1211,11 +1210,7 @@ function layouts()
     local btnY = refY - 28
     local btnW = 40
     local btnH = 56
-    local tcW = (state.tc_ms) and 180 or 128
-    if user_opts.tcspace >= 50 and user_opts.tcspace <= 200 then
-        -- adjust our hardcoded font size estimation
-        tcW = tcW * user_opts.tcspace / 100
-    end
+    local tcW = osc_geo.w - 520
 
     osc_param.areas = {} -- delete areas
 
@@ -1300,6 +1295,7 @@ function layouts()
     lo = add_layout("tc_both")
     lo.geometry = {x = 348, y = btnY, an = 4, w = tcW, h = btnH}
     lo.style = osc_styles.Time
+    lo.button.maxchars = tcW / 6
 
     lo = add_layout("cy_audio")
     lo.geometry = {x = osc_geo.w - 108, y = btnY, an = 5, w = btnW, h = btnH}
@@ -1815,18 +1811,24 @@ function osc_init()
 
     ne.visible = (mp.get_property_number("duration", 0) > 0)
     ne.content = function ()
+        local possec = mp.get_property_number("playback-time", 0)
+        local ch = get_chapter(possec)
+        local chapter_title = ""
+        if ch and ch.title and ch.title ~= "" then
+            chapter_title = " • " .. ch.title
+        end
         if (state.rightTC_trem) then
             local minus = user_opts.unicodeminus and UNICODE_MINUS or "-"
             if state.tc_ms then
-                return (mp.get_property_osd("playback-time/full").." / "..minus..mp.get_property_osd("playtime-remaining/full"))
+                return (mp.get_property_osd("playback-time/full").." / "..minus..mp.get_property_osd("playtime-remaining/full")..chapter_title)
             else
-                return (mp.get_property_osd("playback-time").." / "..minus..mp.get_property_osd("playtime-remaining"))
+                return (mp.get_property_osd("playback-time").." / "..minus..mp.get_property_osd("playtime-remaining")..chapter_title)
             end
         else
             if state.tc_ms then
-                return (mp.get_property_osd("playback-time/full").." / "..mp.get_property_osd("duration/full"))
+                return (mp.get_property_osd("playback-time/full").." / "..mp.get_property_osd("duration/full")..chapter_title)
             else
-                return (mp.get_property_osd("playback-time").." / "..mp.get_property_osd("duration"))
+                return (mp.get_property_osd("playback-time").." / "..mp.get_property_osd("duration")..chapter_title)
             end
         end
     end
