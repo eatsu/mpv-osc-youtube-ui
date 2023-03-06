@@ -1738,13 +1738,13 @@ function osc_init()
             mp.commandv("seek", get_slider_value(element), "absolute-percent", "exact")
             element.state.mbtnleft = true
         end
-    ne.eventresponder['mbtn_left_up'] =
+    ne.eventresponder["mbtn_left_up"] =
         function (element) element.state.mbtnleft = false end
-    ne.eventresponder['mbtn_right_down'] = --seeks to chapter start
+    ne.eventresponder["mbtn_right_down"] = --seeks to chapter start
         function (element)
-            local duration = mp.get_property_number('duration', nil)
+            local duration = mp.get_property_number("duration", nil)
             if not (duration == nil) then
-                local chapters = mp.get_property_native('chapter-list', {})
+                local chapters = mp.get_property_native("chapter-list", {})
                 if #chapters > 0 then
                     local pos = get_slider_value(element)
                     local ch = #chapters
@@ -1754,11 +1754,14 @@ function osc_init()
                             break
                         end
                     end
-                    mp.commandv('set', 'chapter', ch - 1)
-                    --if chapters[ch].title then show_message(chapters[ch].time) end
+                    mp.commandv("set", "chapter", ch - 1)
                 end
             end
         end
+    ne.eventresponder["wheel_up_press"] =
+        function () mp.commandv("seek", 5, "relative-percent", "exact") end
+    ne.eventresponder["wheel_down_press"] =
+        function () mp.commandv("seek", -5, "relative-percent", "exact") end
     ne.eventresponder["reset"] =
         function (element) element.state.lastseek = nil end
 
@@ -1790,8 +1793,6 @@ function osc_init()
             end
             mp.commandv("osd-msg", "set", "volume", get_slider_value(element))
         end
-    ne.eventresponder["reset"] =
-        function (element) element.state.lastseek = nil end
     ne.eventresponder["wheel_up_press"] =
         function ()
             if state.mute then
@@ -1806,6 +1807,8 @@ function osc_init()
             end
             mp.commandv("osd-msg", "add", "volume", -5)
         end
+    ne.eventresponder["reset"] =
+        function (element) element.state.lastseek = nil end
 
     -- tc_both (current pos + total/remaining time)
     ne = new_element("tc_both", "button")
