@@ -733,7 +733,7 @@ function render_elements(master_ass)
             elem_ass:draw_stop()
 
             -- add tooltip
-            if not (element.slider.tooltipF == nil) then
+            if not (element.slider.tooltipF == nil) and element.enabled then
 
                 if mouse_hit(element) then
                     local sliderpos = get_slider_value(element)
