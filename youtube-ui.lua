@@ -1046,7 +1046,7 @@ function add_layout(name)
             elements[name].layout.slider = {
                 border = 1,
                 gap = 1,
-                nibbles_top = true,
+                nibbles_top = false,
                 nibbles_bottom = true,
                 adjust_tooltip = true,
                 tooltip_style = "",
