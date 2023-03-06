@@ -1523,6 +1523,10 @@ function osc_init()
         function () set_track("audio", -1) end
     ne.eventresponder["shift+mbtn_left_up"] =
         function () show_message(get_tracklist("audio"), 2) end
+    ne.eventresponder["wheel_up_press"] =
+        function () set_track("audio", -1) end
+    ne.eventresponder["wheel_down_press"] =
+        function () set_track("audio", 1) end
 
     --cy_sub
     ne = new_element("cy_sub", "button")
@@ -1553,6 +1557,10 @@ function osc_init()
         function () set_track("sub", -1) end
     ne.eventresponder["shift+mbtn_left_up"] =
         function () show_message(get_tracklist("sub"), 2) end
+    ne.eventresponder["wheel_up_press"] =
+        function () set_track("sub", -1) end
+    ne.eventresponder["wheel_down_press"] =
+        function () set_track("sub", 1) end
 
     -- volume
     ne = new_element("volume", "button")
