@@ -52,18 +52,18 @@ opt.read_options(user_opts, "osc", function(list) update_options(list) end)
 local language = {
     ["eng"] = {
         welcome = "{\\fs24\\1c&H0&\\3c&HFFFFFF&}Drop files or URLs to play here.",  -- this text appears when mpv starts
-        off = "OFF",
-        na = "n/a",
+        off = "Off",
+        unknown = "unknown",
         none = "none",
-        video = "Video",
-        audio = "Audio",
+        video_track = "Video track",
+        video_tracks = "Video tracks",
+        audio_track = "Audio track",
+        audio_tracks = "Audio tracks",
         subtitle = "Subtitle",
-        available = "Available ",
-        track = " Tracks: ",
+        subtitles = "Subtitles",
         playlist = "Playlist",
-        nolist = "Empty playlist.",
         chapter = "Chapter",
-        nochapter = "No chapters.",
+        chapters = "Chapters",
     },
     ["chs"] = {
         welcome = "{\\1c&H00\\bord0\\fs30\\fn微软雅黑 light\\fscx125}MPV{\\fscx100} 播放器",  -- this text appears when mpv starts
@@ -386,7 +386,8 @@ end
 -- Tracklist Management
 --
 
-local nicetypes = {video = texts.video, audio = texts.audio, sub = texts.subtitle}
+local nicetypes = {video = texts.video_track, audio = texts.audio_track, sub = texts.subtitle}
+local nicetypes_pl = {video = texts.video_tracks, audio = texts.audio_tracks, sub = texts.subtitles}
 
 -- updates the OSC internal playlists, should be run each time the track-layout changes
 function update_tracklist()
@@ -415,19 +416,19 @@ end
 
 -- return a nice list of tracks of the given type (video, audio, sub)
 function get_tracklist(type)
-    local msg = texts.available .. nicetypes[type] .. texts.track
+    local msg = nicetypes_pl[type] .. ": "
     if not tracks_osc or #tracks_osc[type] == 0 then
         msg = msg .. texts.none
     else
         for n = 1, #tracks_osc[type] do
             local track = tracks_osc[type][n]
-            local lang, title, selected = "unknown", "", "○"
+            local lang, title, selected = texts.unknown, "", "○"
             if not(track.lang == nil) then lang = track.lang end
             if not(track.title == nil) then title = track.title end
             if (track.id == tonumber(mp.get_property(type))) then
                 selected = "●"
             end
-            msg = msg.."\n"..selected.." "..n..": ["..lang.."] "..title
+            msg = msg.."\n"..selected.." "..n..". ["..lang.."] "..title
         end
     end
     return msg
@@ -454,11 +455,11 @@ function set_track(type, next)
     mp.commandv("set", type, new_track_mpv)
 
     if (new_track_osc == 0) then
-        show_message(nicetypes[type] .. texts.track .. texts.none)
+        show_message(nicetypes[type] .. ": " .. texts.off)
     else
-        show_message(nicetypes[type]  .. texts.track
+        show_message(nicetypes[type]  .. ": "
             .. new_track_osc .. "/" .. #tracks_osc[type]
-            .. " [".. (tracks_osc[type][new_track_osc].lang or "unknown") .."] "
+            .. " [".. (tracks_osc[type][new_track_osc].lang or texts.unknown) .."] "
             .. (tracks_osc[type][new_track_osc].title or ""))
     end
 end
@@ -916,7 +917,7 @@ function get_playlist()
     local pos = mp.get_property_number('playlist-pos', 0) + 1
     local count, limlist = limited_list('playlist', pos)
     if count == 0 then
-        return texts.nolist
+        return texts.playlist .. ': ' .. texts.none
     end
 
     local message = string.format(texts.playlist .. ' [%d/%d]:\n', pos, count)
@@ -926,8 +927,8 @@ function get_playlist()
         if title == nil then
             title = filename
         end
-        message = string.format('%s %s %s\n', message,
-            (v.current and '●' or '○'), title)
+        message = string.format('%s %s %s. %s\n', message,
+            (v.current and '●' or '○'), i, title)
     end
     return message
 end
@@ -936,18 +937,18 @@ function get_chapterlist()
     local pos = mp.get_property_number('chapter', 0) + 1
     local count, limlist = limited_list('chapter-list', pos)
     if count == 0 then
-        return texts.nochapter
+        return texts.chapters .. ': ' .. texts.none
     end
 
-    local message = string.format(texts.chapter .. ' [%d/%d]:\n', pos, count)
+    local message = string.format(texts.chapters .. ' [%d/%d]:\n', pos, count)
     for i, v in ipairs(limlist) do
         local time = mp.format_time(v.time)
         local title = v.title
         if title == nil then
             title = string.format(texts.chapter .. ' %02d', i)
         end
-        message = string.format('%s[%s] %s %s\n', message, time,
-            (v.current and '●' or '○'), title)
+        message = string.format('%s %s [%s] %s\n', message,
+            (v.current and '●' or '○'), time, title)
     end
     return message
 end
@@ -1503,7 +1504,7 @@ function osc_init()
     ne.tooltipF = function ()
         local msg = texts.off
         if not (get_track("audio") == 0) then
-            local lang = mp.get_property("current-tracks/audio/lang") or "unknown"
+            local lang = mp.get_property("current-tracks/audio/lang") or texts.unknown
             local title = mp.get_property("current-tracks/audio/title")
             if title then
                 msg = title
@@ -1511,7 +1512,7 @@ function osc_init()
                 msg = "[" .. lang .. "]"
             end
         end
-        return "Audio track: " .. msg
+        return texts.audio_track .. ": " .. msg
     end
     ne.eventresponder["mbtn_left_up"] =
         function () set_track("audio", 1) end
@@ -1533,7 +1534,7 @@ function osc_init()
     ne.tooltipF = function ()
         local msg = texts.off
         if not (get_track("sub") == 0) then
-            local lang = mp.get_property("current-tracks/sub/lang") or "unknown"
+            local lang = mp.get_property("current-tracks/sub/lang") or texts.unknown
             local title = mp.get_property("current-tracks/sub/title")
             if title then
                 msg = title
@@ -1541,7 +1542,7 @@ function osc_init()
                 msg = "[" .. lang .. "]"
             end
         end
-        return "Subtitle: " .. msg
+        return texts.subtitle .. ": " .. msg
     end
     ne.eventresponder["mbtn_left_up"] =
         function () set_track("sub", 1) end
