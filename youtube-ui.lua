@@ -146,6 +146,7 @@ local state = {
     osd = mp.create_osd_overlay("ass-events"),
     chapter_list = {},                      -- sorted by time
     last_visibility = user_opts.visibility, -- last visibility on pause
+    mute = false,
 }
 
 local icons = {
@@ -1547,10 +1548,9 @@ function osc_init()
     ne.visible = (osc_param.playresx >= 650) and user_opts.volumecontrol
     ne.content = function ()
         local volume = mp.get_property_number("volume", 0)
-        local mute = mp.get_property_native("mute")
         local volicon = {icons.volume_low, icons.volume_medium,
                          icons.volume_high, icons.volume_over}
-        if volume == 0 or mute then
+        if volume == 0 or state.mute then
             return icons.volume_mute
         else
             return volicon[math.min(4,math.ceil(volume / (100/3)))]
@@ -1558,8 +1558,7 @@ function osc_init()
     end
     ne.tooltip_style = osc_styles.Tooltip
     ne.tooltipF = function ()
-        local mute = mp.get_property_native("mute")
-        if mute then
+        if state.mute then
             return "Unmute"
         else
             return "Mute"
@@ -1569,9 +1568,19 @@ function osc_init()
         function () mp.commandv("cycle", "mute") end
 
     ne.eventresponder["wheel_up_press"] =
-        function () mp.commandv("osd-msg", "add", "volume", 5) end
+        function ()
+            if state.mute then
+                mp.commandv("cycle", "mute")
+            end
+            mp.commandv("osd-msg", "add", "volume", 5)
+        end
     ne.eventresponder["wheel_down_press"] =
-        function () mp.commandv("osd-msg", "add", "volume", -5) end
+        function ()
+            if state.mute then
+                mp.commandv("cycle", "mute")
+            end
+            mp.commandv("osd-msg", "add", "volume", -5)
+        end
 
     --tog_fs
     ne = new_element("tog_fs", "button")
@@ -1749,14 +1758,28 @@ function osc_init()
             end
         end
     ne.eventresponder["mbtn_left_down"] = --exact seeks on single clicks
-        function (element) mp.commandv("osd-msg", "set", "volume",
-            get_slider_value(element)) end
+        function (element)
+            if state.mute then
+                mp.commandv("cycle", "mute")
+            end
+            mp.commandv("osd-msg", "set", "volume", get_slider_value(element))
+        end
     ne.eventresponder["reset"] =
         function (element) element.state.lastseek = nil end
     ne.eventresponder["wheel_up_press"] =
-        function () mp.commandv("osd-msg", "add", "volume", 5) end
+        function ()
+            if state.mute then
+                mp.commandv("cycle", "mute")
+            end
+            mp.commandv("osd-msg", "add", "volume", 5)
+        end
     ne.eventresponder["wheel_down_press"] =
-        function () mp.commandv("osd-msg", "add", "volume", -5) end
+        function ()
+            if state.mute then
+                mp.commandv("cycle", "mute")
+            end
+            mp.commandv("osd-msg", "add", "volume", -5)
+        end
 
     -- tc_both (current pos + total/remaining time)
     ne = new_element("tc_both", "button")
@@ -2380,6 +2403,11 @@ mp.register_script_message("osc-tracklist", function(dur)
     show_message(table.concat(msg, '\n\n'), dur)
 end)
 
+mp.observe_property("mute", "bool",
+    function(name, val)
+        state.mute = val
+    end
+)
 mp.observe_property("fullscreen", "bool",
     function(name, val)
         state.fullscreen = val
