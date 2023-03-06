@@ -1414,6 +1414,8 @@ function osc_init()
 
     ne.content = icons.pl_prev
     ne.enabled = (pl_pos > 1) or (loop ~= "no")
+    ne.tooltip_style = osc_styles.Tooltip
+    ne.tooltipF = "Previous"
     ne.eventresponder["mbtn_left_up"] =
         function ()
             mp.commandv("playlist-prev", "weak")
@@ -1428,6 +1430,8 @@ function osc_init()
 
     ne.content = icons.pl_next
     ne.enabled = (have_pl and (pl_pos < pl_count)) or (loop ~= "no")
+    ne.tooltip_style = osc_styles.Tooltip
+    ne.tooltipF = "Next"
     ne.eventresponder["mbtn_left_up"] =
         function ()
             mp.commandv("playlist-next", "weak")
@@ -1450,6 +1454,14 @@ function osc_init()
             return icons.pause
         end
     end
+    ne.tooltip_style = osc_styles.Tooltip
+    ne.tooltipF = function ()
+        if mp.get_property("pause") == "yes" then
+            return "Play"
+        else
+            return "Pause"
+        end
+    end
     ne.eventresponder["mbtn_left_up"] =
         function () mp.commandv("cycle", "pause") end
     --ne.eventresponder["mbtn_right_up"] =
@@ -1460,6 +1472,8 @@ function osc_init()
 
     ne.softrepeat = true
     ne.content = icons.skipback
+    ne.tooltip_style = osc_styles.Tooltip
+    ne.tooltipF = "Seek backward"
     ne.eventresponder["mbtn_left_down"] =
         function () mp.commandv("seek", -5, "exact") end
     ne.eventresponder["shift+mbtn_left_down"] =
@@ -1472,6 +1486,8 @@ function osc_init()
 
     ne.softrepeat = true
     ne.content = icons.skipfrwd
+    ne.tooltip_style = osc_styles.Tooltip
+    ne.tooltipF = "Seek forward"
     ne.eventresponder["mbtn_left_down"] =
         function () mp.commandv("seek", 5, "exact") end
     ne.eventresponder["shift+mbtn_left_down"] =
@@ -1592,6 +1608,14 @@ function osc_init()
         end
     end
     ne.visible = (osc_param.playresx >= 540)
+    ne.tooltip_style = osc_styles.Tooltip
+    ne.tooltipF = function ()
+        if (state.fullscreen) then
+            return "Exit full screen"
+        else
+            return "Full screen"
+        end
+    end
     ne.eventresponder["mbtn_left_up"] =
         function () mp.commandv("cycle", "fullscreen") end
 
@@ -1599,6 +1623,8 @@ function osc_init()
     ne = new_element("tog_info", "button")
     ne.content = icons.info
     ne.visible = (osc_param.playresx >= 600)
+    ne.tooltip_style = osc_styles.Tooltip
+    ne.tooltipF = "Information"
     ne.eventresponder["mbtn_left_up"] =
         function () mp.commandv("script-binding", "stats/display-stats-toggle") end
 
