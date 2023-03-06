@@ -13,8 +13,8 @@ local user_opts = {
     showfullscreen = true,      -- show OSC when fullscreen?
     idlescreen = true,          -- show mpv logo on idle
     scalewindowed = 1,          -- scaling of the controller when windowed
-    scalefullscreen = 1,        -- scaling of the controller when fullscreen
-    scaleforcedwindow = 2,      -- scaling when rendered on a forced window
+    scalefullscreen = 1.5,      -- scaling of the controller when fullscreen
+    scaleforcedwindow = 1,      -- scaling when rendered on a forced window
     vidscale = false,           -- scale the controller with the video?
     hidetimeout = 2000,         -- duration in ms until the OSC hides if no
                                 -- mouse movement. enforced non-negative for the
