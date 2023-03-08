@@ -445,6 +445,10 @@ function set_track(type, next)
         current_track_osc = tracks_mpv[type][current_track_mpv].osc_id
     end
     local new_track_osc = (current_track_osc + next) % (#tracks_osc[type] + 1)
+    -- never set 0 for audio/video
+    if new_track_osc == 0 and type ~= "sub" then
+        new_track_osc = (current_track_osc + next - 1) % #tracks_osc[type] + 1
+    end
     local new_track_mpv
     if new_track_osc == 0 then
         new_track_mpv = "no"
