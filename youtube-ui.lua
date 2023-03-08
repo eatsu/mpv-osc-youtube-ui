@@ -27,7 +27,7 @@ local user_opts = {
                                 -- internal track list management (and some
                                 -- functions that depend on it)
     seekrange = true,           -- show seekrange overlay
-    seekrangealpha = 128,       -- transparency of seekranges
+    seekrangealpha = 192,       -- transparency of seekranges
     seekbarkeyframes = true,    -- use keyframes when dragging the seekbar
     title = "${media-title}",   -- string compatible with property-expansion
                                 -- to be shown as OSC title
@@ -549,7 +549,7 @@ function prepare_elements()
             local slider_lo = element.layout.slider
 
             -- calculate positions of min and max points
-            element.slider.min.ele_pos = elem_geo.h / 2
+            element.slider.min.ele_pos = slider_lo.pad + slider_lo.handle_size / 2
             element.slider.max.ele_pos = elem_geo.w - element.slider.min.ele_pos
             element.slider.min.glob_pos = element.hitbox.x1 + element.slider.min.ele_pos
             element.slider.max.glob_pos = element.hitbox.x1 + element.slider.max.ele_pos
@@ -697,29 +697,61 @@ function render_elements(master_ass)
 
             -- draw pos marker
             local pos = element.slider.posF()
-            local seekRanges
-            local rh = elem_geo.h / 2 -- Handle radius
-            local xp
+            local foH = elem_geo.h / 2
+            local r = slider_lo.handle_size / 2
+            local bar_r = slider_lo.bar_height / 2
+            local range_r = bar_r + 2
+            local pad = slider_lo.pad
 
-            if pos then
-                xp = get_slider_ele_pos_for(element, pos)
-                ass_draw_cir_cw(elem_ass, xp, elem_geo.h/2, rh)
-                elem_ass:rect_cw(0, slider_lo.gap, xp, elem_geo.h - slider_lo.gap)
+            if element.slider.seekRangesF ~= nil then
+                local seekRanges = element.slider.seekRangesF()
             end
 
-			if element.slider.seekRangesF ~= nil then seekRanges = element.slider.seekRangesF() end
-
             if seekRanges then
-                elem_ass:draw_stop()
                 elem_ass:merge(element.style_ass)
+                elem_ass:append(slider_lo.bg_style)
                 ass_append_alpha(elem_ass, element.layout.alpha, user_opts.seekrangealpha)
                 elem_ass:merge(element.static_ass)
 
                 for _,range in pairs(seekRanges) do
                     local pstart = get_slider_ele_pos_for(element, range["start"])
                     local pend = get_slider_ele_pos_for(element, range["end"])
-                    elem_ass:rect_cw(pstart - rh, slider_lo.gap, pend + rh, elem_geo.h - slider_lo.gap)
+                    ass_draw_rr_h_cw(elem_ass, pstart - range_r, foH - range_r,
+                                     pend + range_r, foH + range_r,
+                                     range_r, false)
                 end
+            end
+
+            if pos then
+                local xp = get_slider_ele_pos_for(element, pos)
+
+                elem_ass:merge(element.style_ass)
+                elem_ass:append(slider_lo.bg_style)
+                ass_append_alpha(elem_ass, slider_lo.alpha, slider_lo.bg_alpha)
+                elem_ass:merge(element.static_ass)
+
+                -- inactive bar
+                ass_draw_rr_h_cw(elem_ass, xp, foH - bar_r,
+                                 elem_geo.w - (pad + r - bar_r), foH + bar_r,
+                                 0, false, bar_r)
+
+                elem_ass:merge(element.style_ass)
+                ass_append_alpha(elem_ass, element.layout.alpha, 0)
+                elem_ass:merge(element.static_ass)
+
+                -- active bar
+                ass_draw_rr_h_cw(elem_ass, pad + r - bar_r, foH - bar_r,
+                                 xp, foH + bar_r,
+                                 bar_r, false, 0)
+
+                -- handle
+                ass_draw_rr_h_cw(elem_ass, xp - r, foH - r,
+                                 xp + r, foH + r,
+                                 r, false)
+
+                elem_ass:merge(element.style_ass)
+                ass_append_alpha(elem_ass, element.layout.alpha, 0)
+                elem_ass:merge(element.static_ass)
             end
 
             if element.enabled and not (slider_lo.adjust_tooltip) then
@@ -767,7 +799,7 @@ function render_elements(master_ass)
                     else
                         -- for volumebar
                         tx = element.hitbox.x1 + elem_geo.w / 2
-                        ty = ty - 10
+                        ty = ty + 12
                     end
 
                     -- tooltip label
@@ -1046,6 +1078,11 @@ function add_layout(name)
             elements[name].layout.slider = {
                 border = 1,
                 gap = 1,
+                pad = 0,
+                handle_size = 16,
+                bar_height = 4,
+                bg_style = "",
+                bg_alpha = 192,
                 nibbles_top = false,
                 nibbles_bottom = true,
                 adjust_tooltip = true,
@@ -1242,32 +1279,27 @@ function layouts()
     lo.alpha[3] = 0
 
     -- Seekbar
-    new_element("seekbarbg", "box")
-    lo = add_layout("seekbarbg")
-    lo.geometry = {x = refX , y = refY - 64, an = 5, w = osc_geo.w - 32, h = 2}
-    lo.layer = 13
-    lo.style = osc_styles.SeekbarBg
-    lo.alpha[1] = 153
-
     lo = add_layout("seekbar")
     lo.geometry = {x = refX, y = refY - 64, an = 5, w = osc_geo.w - 32, h = 16}
     lo.style = osc_styles.SeekbarFg
     lo.slider.gap = 7
+    lo.slider.pad = 0
+    lo.slider.handle_size = 16
+    lo.slider.bar_height = 2
+    lo.slider.bg_style = osc_styles.SeekbarBg
+    lo.slider.bg_alpha = 192
     lo.slider.tooltip_style = osc_styles.Tooltip
 
     -- Volumebar
-    lo = new_element("volumebarbg", "box")
-    lo.visible = (osc_param.playresx >= 750) and user_opts.volumecontrol and (#tracks_osc.audio > 0)
-    lo = add_layout("volumebarbg")
-    lo.geometry = {x = 252, y = btnY, an = 4, w = 80, h = 2}
-    lo.layer = 13
-    lo.style = osc_styles.VolumebarBg
-    lo.alpha[1] = 153
-
     lo = add_layout("volumebar")
-    lo.geometry = {x = 252, y = btnY, an = 4, w = 80, h = 8}
+    lo.geometry = {x = 252, y = btnY, an = 4, w = 80, h = btnH}
     lo.style = osc_styles.VolumebarFg
     lo.slider.gap = 3
+    lo.slider.pad = 0
+    lo.slider.handle_size = 12
+    lo.slider.bar_height = 2
+    lo.slider.bg_style = osc_styles.VolumebarBg
+    lo.slider.bg_alpha = 192
     lo.slider.tooltip_style = osc_styles.Tooltip
     lo.slider.adjust_tooltip = false
 
