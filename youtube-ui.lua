@@ -1340,6 +1340,13 @@ function layouts()
     lo.style = osc_styles.button
     lo.visible = (osc_param.playresx >= 600)
 
+    -- Subtitle marker
+    lo = new_element("sub_marker", "box")
+    lo.visible = (get_track("sub") > 0)
+    lo = add_layout("sub_marker")
+    lo.geometry = {x = osc_geo.w - 148, y = btnY + 13, an = 5, w = 24, h = 2}
+    lo.style = osc_styles.SeekbarFg
+
     lo = add_layout("volume")
     lo.geometry = {x = 228, y = btnY, an = 5, w = btnW, h = btnH}
     lo.style = osc_styles.button
