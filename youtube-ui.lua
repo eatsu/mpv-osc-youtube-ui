@@ -105,7 +105,6 @@ local osc_styles = {
     Time = "{\\blur0\\bord0\\1c&HFFFFFF&\\3c&H000000&\\fs18}",
     Tooltip = "{\\blur1\\bord0.5\\1c&HFFFFFF&\\3c&H000000&\\fs18}",
     Title = "{\\1c&HFFFFFF\\fs24}",
-    WinCtrl = "{\\blur1\\bord0.5\\1c&HFFFFFF&\\3c&H0\\fs20}",
 }
 
 -- internal states, do not touch
@@ -150,6 +149,10 @@ local state = {
 local icons = {
     play = "{\\p1}m 0 0 m 24 24 m 8 5 l 8 19 l 19 12{\\p0}",
     pause = "{\\p1}m 0 0 m 24 24 m 6 19 l 10 19 l 10 5 l 6 5 l 6 19 m 14 5 l 14 19 l 18 19 l 18 5 l 14 5{\\p0}",
+    close = "{\\p1}m 0 0 m 24 24 m 19 6.41 l 17.59 5 l 12 10.59 l 6.41 5 l 5 6.41 l 10.59 12 l 5 17.59 l 6.41 19 l 12 13.41 l 17.59 19 l 19 17.59 l 13.41 12{\\p0}",
+    minimize = "{\\p1}m 0 0 m 24 24 m 4 18 l 20 18 l 20 20 l 4 20{\\p0}",
+    maximize = "{\\p1}m 0 0 m 24 24 m 18 4 l 6 4 b 4.9 4 4 4.9 4 6 l 4 18 b 4 19.1 4.9 20 6 20 l 18 20 b 19.1 20 20 19.1 20 18 l 20 6 b 20 4.9 19.1 4 18 4 m 18 18 l 6 18 l 6 6 l 18 6 l 18 18{\\p0}",
+    maximize_exit = "{\\p1}m 0 0 m 24 24 m 6 8 l 4 8 l 4 18 b 4 19.1 4.9 20 6 20 l 16 20 l 16 18 l 6 18 m 18 4 l 10 4 b 8.9 4 8 4.9 8 6 l 8 14 b 8 15.1 8.9 16 10 16 l 18 16 b 19.1 16 20 15.1 20 14 l 20 6 b 20 4.9 19.1 4 18 4 m 18 14 l 10 14 l 10 6 l 18 6{\\p0}",
     fs_enter = "{\\p1}m 0 0 m 24 24 m 7 14 l 5 14 l 5 19 l 10 19 l 10 17 l 7 17 l 7 14 m 5 10 l 7 10 l 7 7 l 10 7 l 10 5 l 5 5 l 5 10 m 17 17 l 14 17 l 14 19 l 19 19 l 19 14 l 17 14 l 17 17 m 14 5 l 14 7 l 17 7 l 17 10 l 19 10 l 19 5 l 14 5{\\p0}",
     fs_exit = "{\\p1}m 0 0 m 24 24 m 5 16 l 8 16 l 8 19 l 10 19 l 10 14 l 5 14 l 5 16 m 8 8 l 5 8 l 5 10 l 10 10 l 10 5 l 8 5 l 8 8 m 14 19 l 16 19 l 16 16 l 19 16 l 19 14 l 14 14 l 14 19 m 16 8 l 16 5 l 14 5 l 14 10 l 19 10 l 19 8 l 16 8{\\p0}",
     info = "{\\p1}m 0 0 m 24 24 m 11 7 l 13 7 l 13 9 l 11 9 m 11 11 l 13 11 l 13 17 l 11 17 m 12 2 b 6.48 2 2 6.48 2 12 b 2 17.52 6.48 22 12 22 b 17.52 22 22 17.52 22 12 b 22 6.48 17.52 2 12 2 m 12 20 b 7.59 20 4 16.41 4 12 b 4 7.59 7.59 4 12 4 b 16.41 4 20 7.59 20 12 b 20 16.41 16.41 20 12 20{\\p0}",
@@ -1165,30 +1168,28 @@ function window_controls()
 
     -- Close: 🗙
     ne = new_element("close", "button")
-    ne.content = "\238\132\149"
+    ne.content = icons.close
     ne.eventresponder["mbtn_left_up"] =
         function () mp.commandv("quit") end
     lo = add_layout("close")
     lo.geometry = alignment == "left" and first_geo or third_geo
-    lo.style = osc_styles.WinCtrl
-    lo.alpha[3] = 0
+    lo.style = osc_styles.button
 
     -- Minimize: 🗕
     ne = new_element("minimize", "button")
-    ne.content = "\238\132\146"
+    ne.content = icons.minimize
     ne.eventresponder["mbtn_left_up"] =
         function () mp.commandv("cycle", "window-minimized") end
     lo = add_layout("minimize")
     lo.geometry = alignment == "left" and second_geo or first_geo
-    lo.style = osc_styles.WinCtrl
-    lo.alpha[3] = 0
+    lo.style = osc_styles.button
 
     -- Maximize: 🗖 /🗗
     ne = new_element("maximize", "button")
     if state.maximized or state.fullscreen then
-        ne.content = "\238\132\148"
+        ne.content = icons.maximize_exit
     else
-        ne.content = "\238\132\147"
+        ne.content = icons.maximize
     end
     ne.eventresponder["mbtn_left_up"] =
         function ()
@@ -1200,8 +1201,7 @@ function window_controls()
         end
     lo = add_layout("maximize")
     lo.geometry = alignment == "left" and third_geo or second_geo
-    lo.style = osc_styles.WinCtrl
-    lo.alpha[3] = 0
+    lo.style = osc_styles.button
 
     -- deadzone below window controls
     local sh_area_y0, sh_area_y1
