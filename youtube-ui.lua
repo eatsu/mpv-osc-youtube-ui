@@ -40,7 +40,6 @@ local user_opts = {
     livemarkers = true,         -- update seekbar chapter markers on duration change
     chapter_fmt = "Chapter: %s", -- chapter print format for seekbar-hover. "no" to disable
     unicodeminus = false,       -- whether to use the Unicode minus sign character
-    volumecontrol = true,       -- whether to show mute button and volumne slider
     language = "eng",           -- eng=English, chs=Chinese
     thumbpad = 4,               -- thumbnail border size
 }
@@ -1296,7 +1295,7 @@ function layouts()
 
     -- Volumebar
     lo = add_layout("volumebar")
-    lo.geometry = {x = 252, y = btnY, an = 4, w = 80, h = btnH}
+    lo.geometry = {x = 248, y = btnY, an = 4, w = 80, h = btnH}
     lo.style = osc_styles.VolumebarFg
     lo.slider.gap = 3
     lo.slider.pad = 0
@@ -1330,23 +1329,21 @@ function layouts()
 
     -- Timecode
     lo = add_layout("tc_both")
-    lo.geometry = {x = 348, y = btnY, an = 4, w = tcW, h = btnH}
+    lo.geometry = {x = 340, y = btnY, an = 4, w = tcW, h = btnH}
     lo.style = osc_styles.Time
     lo.button.maxchars = tcW / 6
 
     lo = add_layout("cy_audio")
     lo.geometry = {x = osc_geo.w - 108, y = btnY, an = 5, w = btnW, h = btnH}
     lo.style = osc_styles.button
-    lo.visible = (osc_param.playresx >= 540)
 
     lo = add_layout("cy_sub")
     lo.geometry = {x = osc_geo.w - 148, y = btnY, an = 5, w = btnW, h = btnH}
     lo.style = osc_styles.button
-    lo.visible = (osc_param.playresx >= 600)
 
     -- Subtitle marker
     lo = new_element("sub_marker", "box")
-    lo.visible = (get_track("sub") > 0)
+    lo.visible = (get_track("sub") > 0) and (osc_param.playresx >= 496)
     lo = add_layout("sub_marker")
     lo.geometry = {x = osc_geo.w - 148, y = btnY + 13, an = 5, w = 24, h = 2}
     lo.style = osc_styles.SeekbarFg
@@ -1354,17 +1351,14 @@ function layouts()
     lo = add_layout("volume")
     lo.geometry = {x = 228, y = btnY, an = 5, w = btnW, h = btnH}
     lo.style = osc_styles.button
-    lo.visible = (osc_param.playresx >= 650)
 
     lo = add_layout("tog_fs")
     lo.geometry = {x = osc_geo.w - 28, y = btnY, an = 5, w = btnW, h = btnH}
     lo.style = osc_styles.button
-    lo.visible = (osc_param.playresx >= 540)
 
     lo = add_layout("tog_info")
     lo.geometry = {x = osc_geo.w - 68, y = btnY, an = 5, w = btnW, h = btnH}
     lo.style = osc_styles.button
-    lo.visible = (osc_param.playresx >= 600)
 
     -- Title
     geo = { x = 20, y = refY - 92, an = 1, w = osc_geo.w - 48, h = 48 }
@@ -1541,7 +1535,7 @@ function osc_init()
     --cy_audio
     ne = new_element("cy_audio", "button")
     ne.enabled = (#tracks_osc.audio > 1)
-    ne.visible = (osc_param.playresx >= 540)
+    ne.visible = (osc_param.playresx >= 456)
     ne.content = icons.cy_audio
     ne.tooltip_style = osc_styles.Tooltip
     ne.tooltipF = function ()
@@ -1571,7 +1565,7 @@ function osc_init()
     --cy_sub
     ne = new_element("cy_sub", "button")
     ne.enabled = (#tracks_osc.sub > 0)
-    ne.visible = (osc_param.playresx >= 600)
+    ne.visible = (osc_param.playresx >= 496)
     ne.content = icons.cy_sub
     ne.tooltip_style = osc_styles.Tooltip
     ne.tooltipF = function ()
@@ -1601,7 +1595,6 @@ function osc_init()
     -- volume
     ne = new_element("volume", "button")
     ne.enabled = (#tracks_osc.audio > 0)
-    ne.visible = (osc_param.playresx >= 650) and user_opts.volumecontrol
     ne.content = function ()
         local volume = mp.get_property_number("volume", 0)
         local volicon = {icons.volume_low, icons.volume_medium,
@@ -1647,7 +1640,7 @@ function osc_init()
             return icons.fs_enter
         end
     end
-    ne.visible = (osc_param.playresx >= 540)
+    ne.visible = (osc_param.playresx >= 376)
     ne.tooltip_style = osc_styles.Tooltip
     ne.tooltipF = function ()
         if (state.fullscreen) then
@@ -1662,7 +1655,7 @@ function osc_init()
     --tog_info
     ne = new_element("tog_info", "button")
     ne.content = icons.info
-    ne.visible = (osc_param.playresx >= 600)
+    ne.visible = (osc_param.playresx >= 416)
     ne.tooltip_style = osc_styles.Tooltip
     ne.tooltipF = "Information"
     ne.eventresponder["mbtn_left_up"] =
@@ -1807,7 +1800,6 @@ function osc_init()
 
     --volumebar
     ne = new_element("volumebar", "slider")
-    ne.visible = (osc_param.playresx >= 700) and user_opts.volumecontrol
     ne.enabled = (#tracks_osc.audio > 0)
     ne.slider.tooltipF =
         function ()
@@ -1853,7 +1845,7 @@ function osc_init()
     -- tc_both (current pos + total/remaining time)
     ne = new_element("tc_both", "button")
 
-    ne.visible = (mp.get_property_number("duration", 0) > 0)
+    ne.visible = (mp.get_property_number("duration", 0) > 0) and (osc_param.playresx >= 560)
     ne.content = function ()
         local possec = mp.get_property_number("playback-time", 0)
         local ch = get_chapter(possec)
