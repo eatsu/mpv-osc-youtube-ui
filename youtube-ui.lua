@@ -2582,7 +2582,6 @@ function visibility_mode(mode, no_osd)
     end
 
     if mode == "auto" then
-        always_on(false)
         enable_osc(true)
     elseif mode == "always" then
         enable_osc(true)
