@@ -1996,7 +1996,8 @@ end
 
 function pause_state(name, enabled)
     state.paused = enabled
-    if state.paused then
+    state.showtime = mp.get_time()
+    if enabled then
         visibility_mode("always", true)
     else
         visibility_mode(state.last_visibility, true)
