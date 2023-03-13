@@ -1661,21 +1661,21 @@ function osc_init()
         if not ((duration == nil) or (pos == nil)) then
             local possec = duration * (pos / 100)
             local chapters = mp.get_property_native("chapter-list", {})
-			if #chapters > 0 then
-				local ch = #chapters
-				local i
-				for i = 1, #chapters do
-					if chapters[i].time / duration * 100 >= pos then
-						ch = i - 1
-						break
-					end
-				end
-				if ch == 0 then
-					return mp.format_time(possec)
-				elseif chapters[ch].title then
-					return mp.format_time(possec) .. " • " .. chapters[ch].title
-				end
-			end
+            if #chapters > 0 then
+                local ch = #chapters
+                local i
+                for i = 1, #chapters do
+                    if chapters[i].time / duration * 100 >= pos then
+                        ch = i - 1
+                        break
+                    end
+                end
+                if ch == 0 then
+                    return mp.format_time(possec)
+                elseif chapters[ch].title then
+                    return mp.format_time(possec) .. " • " .. chapters[ch].title
+                end
+            end
             return mp.format_time(possec)
         else
             return ""
