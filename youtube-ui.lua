@@ -102,7 +102,7 @@ local osc_styles = {
     volumebar_fg = "{\\blur0\\bord0\\1c&HFFFFFF}",
     button = "{\\blur0\\bord0\\1c&HFFFFFF\\3c&HFFFFFF}",
     timecode = "{\\blur0\\bord0\\1c&HFFFFFF\\3c&H000000\\fs18}",
-    tooltip = "{\\blur1\\bord0.5\\1c&HFFFFFF\\3c&H000000\\fs18}",
+    tooltip = "{\\blur1.5\\bord0.01\\1c&HFFFFFF\\3c&H000000\\fs18}",
     title = "{\\1c&HFFFFFF\\fs24}",
 }
 
