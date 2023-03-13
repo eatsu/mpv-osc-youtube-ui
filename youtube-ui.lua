@@ -1283,7 +1283,7 @@ function layouts()
 
     -- Seekbar
     lo = add_layout("seekbar")
-    lo.geometry = {x = refX, y = refY - 64, an = 5, w = osc_geo.w - 32, h = 16}
+    lo.geometry = {x = refX, y = refY - 64, an = 5, w = osc_geo.w - 40, h = 16}
     lo.style = osc_styles.seekbar_fg
     lo.slider.gap = 7
     lo.slider.pad = 0
