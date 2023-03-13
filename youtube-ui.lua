@@ -96,15 +96,15 @@ local osc_param = { -- calculated by osc_init()
 }
 
 local osc_styles = {
-    box = "{\\blur100\\bord0\\1c&H000000&\\3c&H000000&}",
-    SeekbarBg = "{\\blur0\\bord0\\1c&HFFFFFF&}",
-    SeekbarFg = "{\\blur1\\bord1\\1c&HE39C42&}",
-    VolumebarBg = "{\\blur0\\bord0\\1c&HFFFFFF&}",
-    VolumebarFg = "{\\blur0\\bord0\\1c&HFFFFFF&}",
+    box = "{\\blur100\\bord0\\1c&H000000\\3c&H000000}",
+    seekbar_bg = "{\\blur0\\bord0\\1c&HFFFFFF}",
+    seekbar_fg = "{\\blur0\\bord0\\1c&HE39C42}",
+    volumebar_bg = "{\\blur0\\bord0\\1c&HFFFFFF}",
+    volumebar_fg = "{\\blur0\\bord0\\1c&HFFFFFF}",
     button = "{\\blur0\\bord0\\1c&HFFFFFF\\3c&HFFFFFF}",
-    Time = "{\\blur0\\bord0\\1c&HFFFFFF&\\3c&H000000&\\fs18}",
-    Tooltip = "{\\blur1\\bord0.5\\1c&HFFFFFF&\\3c&H000000&\\fs18}",
-    Title = "{\\1c&HFFFFFF\\fs24}",
+    timecode = "{\\blur0\\bord0\\1c&HFFFFFF\\3c&H000000\\fs18}",
+    tooltip = "{\\blur1\\bord0.5\\1c&HFFFFFF\\3c&H000000\\fs18}",
+    title = "{\\1c&HFFFFFF\\fs24}",
 }
 
 -- internal states, do not touch
@@ -463,9 +463,9 @@ function set_track(type, next)
     if (new_track_osc == 0) then
         show_message(nicetypes[type] .. ": " .. texts.off)
     else
-        show_message(nicetypes[type]  .. ": "
+        show_message(nicetypes[type] .. ": "
             .. new_track_osc .. "/" .. #tracks_osc[type]
-            .. " [".. (tracks_osc[type][new_track_osc].lang or texts.unknown) .."] "
+            .. " [" .. (tracks_osc[type][new_track_osc].lang or texts.unknown) .. "] "
             .. (tracks_osc[type][new_track_osc].title or ""))
     end
 end
@@ -1224,7 +1224,7 @@ function window_controls()
         { x = titlebox_left + left_pad, y = wc_geo.y, an = 1,
           w = titlebox_w, h = wc_geo.h }
     lo.style = string.format("%s{\\clip(%f,%f,%f,%f)}",
-        osc_styles.Title,
+        osc_styles.title,
         titlebox_left + left_pad, wc_geo.y - wc_geo.h,
         titlebox_right - right_pad , wc_geo.y + wc_geo.h)
 
@@ -1284,26 +1284,26 @@ function layouts()
     -- Seekbar
     lo = add_layout("seekbar")
     lo.geometry = {x = refX, y = refY - 64, an = 5, w = osc_geo.w - 32, h = 16}
-    lo.style = osc_styles.SeekbarFg
+    lo.style = osc_styles.seekbar_fg
     lo.slider.gap = 7
     lo.slider.pad = 0
     lo.slider.handle_size = 16
     lo.slider.bar_height = 2
-    lo.slider.bg_style = osc_styles.SeekbarBg
+    lo.slider.bg_style = osc_styles.seekbar_bg
     lo.slider.bg_alpha = 192
-    lo.slider.tooltip_style = osc_styles.Tooltip
+    lo.slider.tooltip_style = osc_styles.tooltip
 
     -- Volumebar
     lo = add_layout("volumebar")
     lo.geometry = {x = 248, y = btnY, an = 4, w = 80, h = btnH}
-    lo.style = osc_styles.VolumebarFg
+    lo.style = osc_styles.volumebar_fg
     lo.slider.gap = 3
     lo.slider.pad = 0
     lo.slider.handle_size = 12
     lo.slider.bar_height = 2
-    lo.slider.bg_style = osc_styles.VolumebarBg
+    lo.slider.bg_style = osc_styles.volumebar_bg
     lo.slider.bg_alpha = 192
-    lo.slider.tooltip_style = osc_styles.Tooltip
+    lo.slider.tooltip_style = osc_styles.tooltip
     lo.slider.adjust_tooltip = false
 
     -- buttons
@@ -1328,9 +1328,9 @@ function layouts()
     lo.style = osc_styles.button
 
     -- Timecode
-    lo = add_layout("tc_both")
+    lo = add_layout("timecode")
     lo.geometry = {x = 340, y = btnY, an = 4, w = tcW, h = btnH}
-    lo.style = osc_styles.Time
+    lo.style = osc_styles.timecode
     lo.button.maxchars = tcW / 6
 
     lo = add_layout("cy_audio")
@@ -1346,7 +1346,7 @@ function layouts()
     lo.visible = (get_track("sub") > 0) and (osc_param.playresx >= 496)
     lo = add_layout("sub_marker")
     lo.geometry = {x = osc_geo.w - 148, y = btnY + 13, an = 5, w = 24, h = 2}
-    lo.style = osc_styles.SeekbarFg
+    lo.style = osc_styles.seekbar_fg
 
     lo = add_layout("volume")
     lo.geometry = {x = 228, y = btnY, an = 5, w = btnW, h = btnH}
@@ -1364,7 +1364,7 @@ function layouts()
     geo = { x = 20, y = refY - 92, an = 1, w = osc_geo.w - 48, h = 48 }
     lo = add_layout("title")
     lo.geometry = geo
-    lo.style = string.format("%s{\\clip(%f,%f,%f,%f)}", osc_styles.Title,
+    lo.style = string.format("%s{\\clip(%f,%f,%f,%f)}", osc_styles.title,
                                 geo.x, geo.y - geo.h, geo.x + geo.w , geo.y)
     lo.alpha[3] = 204
     lo.button.maxchars = geo.w / 13
@@ -1448,7 +1448,7 @@ function osc_init()
 
     ne.content = icons.pl_prev
     ne.enabled = (pl_pos > 1) or (loop ~= "no")
-    ne.tooltip_style = osc_styles.Tooltip
+    ne.tooltip_style = osc_styles.tooltip
     ne.tooltipF = "Previous"
     ne.eventresponder["mbtn_left_up"] =
         function ()
@@ -1464,7 +1464,7 @@ function osc_init()
 
     ne.content = icons.pl_next
     ne.enabled = (have_pl and (pl_pos < pl_count)) or (loop ~= "no")
-    ne.tooltip_style = osc_styles.Tooltip
+    ne.tooltip_style = osc_styles.tooltip
     ne.tooltipF = "Next"
     ne.eventresponder["mbtn_left_up"] =
         function ()
@@ -1488,7 +1488,7 @@ function osc_init()
             return icons.pause
         end
     end
-    ne.tooltip_style = osc_styles.Tooltip
+    ne.tooltip_style = osc_styles.tooltip
     ne.tooltipF = function ()
         if mp.get_property("pause") == "yes" then
             return "Play"
@@ -1506,7 +1506,7 @@ function osc_init()
 
     ne.softrepeat = true
     ne.content = icons.skipback
-    ne.tooltip_style = osc_styles.Tooltip
+    ne.tooltip_style = osc_styles.tooltip
     ne.tooltipF = "Seek backward"
     ne.eventresponder["mbtn_left_down"] =
         function () mp.commandv("seek", -5, "exact") end
@@ -1520,7 +1520,7 @@ function osc_init()
 
     ne.softrepeat = true
     ne.content = icons.skipfrwd
-    ne.tooltip_style = osc_styles.Tooltip
+    ne.tooltip_style = osc_styles.tooltip
     ne.tooltipF = "Seek forward"
     ne.eventresponder["mbtn_left_down"] =
         function () mp.commandv("seek", 5, "exact") end
@@ -1537,7 +1537,7 @@ function osc_init()
     ne.enabled = (#tracks_osc.audio > 1)
     ne.visible = (osc_param.playresx >= 456)
     ne.content = icons.cy_audio
-    ne.tooltip_style = osc_styles.Tooltip
+    ne.tooltip_style = osc_styles.tooltip
     ne.tooltipF = function ()
         local msg = texts.off
         if not (get_track("audio") == 0) then
@@ -1567,7 +1567,7 @@ function osc_init()
     ne.enabled = (#tracks_osc.sub > 0)
     ne.visible = (osc_param.playresx >= 496)
     ne.content = icons.cy_sub
-    ne.tooltip_style = osc_styles.Tooltip
+    ne.tooltip_style = osc_styles.tooltip
     ne.tooltipF = function ()
         local msg = texts.off
         if not (get_track("sub") == 0) then
@@ -1605,7 +1605,7 @@ function osc_init()
             return volicon[math.min(4,math.ceil(volume / (100/3)))]
         end
     end
-    ne.tooltip_style = osc_styles.Tooltip
+    ne.tooltip_style = osc_styles.tooltip
     ne.tooltipF = function ()
         if state.mute then
             return "Unmute"
@@ -1641,7 +1641,7 @@ function osc_init()
         end
     end
     ne.visible = (osc_param.playresx >= 376)
-    ne.tooltip_style = osc_styles.Tooltip
+    ne.tooltip_style = osc_styles.tooltip
     ne.tooltipF = function ()
         if (state.fullscreen) then
             return "Exit full screen"
@@ -1656,7 +1656,7 @@ function osc_init()
     ne = new_element("tog_info", "button")
     ne.content = icons.info
     ne.visible = (osc_param.playresx >= 416)
-    ne.tooltip_style = osc_styles.Tooltip
+    ne.tooltip_style = osc_styles.tooltip
     ne.tooltipF = "Information"
     ne.eventresponder["mbtn_left_up"] =
         function () mp.commandv("script-binding", "stats/display-stats-toggle") end
@@ -1842,8 +1842,8 @@ function osc_init()
     ne.eventresponder["reset"] =
         function (element) element.state.lastseek = nil end
 
-    -- tc_both (current pos + total/remaining time)
-    ne = new_element("tc_both", "button")
+    -- timecode (current pos + total/remaining time)
+    ne = new_element("timecode", "button")
 
     ne.visible = (mp.get_property_number("duration", 0) > 0) and (osc_param.playresx >= 560)
     ne.content = function ()
@@ -1856,15 +1856,23 @@ function osc_init()
         if (state.rightTC_trem) then
             local minus = user_opts.unicodeminus and UNICODE_MINUS or "-"
             if state.tc_ms then
-                return (mp.get_property_osd("playback-time/full").." / "..minus..mp.get_property_osd("playtime-remaining/full")..chapter_title)
+                return (mp.get_property_osd("playback-time/full") .. " / "
+                    .. minus .. mp.get_property_osd("playtime-remaining/full")
+                    .. chapter_title)
             else
-                return (mp.get_property_osd("playback-time").." / "..minus..mp.get_property_osd("playtime-remaining")..chapter_title)
+                return (mp.get_property_osd("playback-time") .. " / "
+                    .. minus .. mp.get_property_osd("playtime-remaining")
+                    .. chapter_title)
             end
         else
             if state.tc_ms then
-                return (mp.get_property_osd("playback-time/full").." / "..mp.get_property_osd("duration/full")..chapter_title)
+                return (mp.get_property_osd("playback-time/full") .. " / "
+                    .. mp.get_property_osd("duration/full")
+                    .. chapter_title)
             else
-                return (mp.get_property_osd("playback-time").." / "..mp.get_property_osd("duration")..chapter_title)
+                return (mp.get_property_osd("playback-time") .. " / "
+                    .. mp.get_property_osd("duration")
+                    .. chapter_title)
             end
         end
     end
