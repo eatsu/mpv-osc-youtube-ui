@@ -768,7 +768,7 @@ function render_elements(master_ass)
                     local ty
 
                     if (an == 2) then
-                        ty = element.hitbox.y1
+                        ty = element.hitbox.y1 - 4
                     else
                         ty = element.hitbox.y1 + elem_geo.h/2
                     end
