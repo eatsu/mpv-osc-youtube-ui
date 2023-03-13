@@ -38,7 +38,6 @@ local user_opts = {
     windowcontrols = "auto",    -- whether to show window controls
     windowcontrols_alignment = "right", -- which side to show window controls on
     livemarkers = true,         -- update seekbar chapter markers on duration change
-    chapter_fmt = "Chapter: %s", -- chapter print format for seekbar-hover. "no" to disable
     unicodeminus = false,       -- whether to use the Unicode minus sign character
     language = "eng",           -- eng=English, chs=Chinese
     thumbpad = 4,               -- thumbnail border size
@@ -639,22 +638,6 @@ function get_chapter(possec)
 end
 
 function render_elements(master_ass)
-
-    -- when the slider is dragged or hovered and we have a target chapter name
-    -- then we use it instead of the normal title. we calculate it before the
-    -- render iterations because the title may be rendered before the slider.
-    state.forced_title = nil
-    local se, ae = state.slider_element, elements[state.active_element]
-    if user_opts.chapter_fmt ~= "no" and se and (ae == se or (not ae and mouse_hit(se))) then
-        local dur = mp.get_property_number("duration", 0)
-        if dur > 0 then
-            local possec = get_slider_value(se) * dur / 100 -- of mouse pos
-            local ch = get_chapter(possec)
-            if ch and ch.title and ch.title ~= "" then
-                state.forced_title = string.format(user_opts.chapter_fmt, ch.title)
-            end
-        end
-    end
 
     for n=1, #elements do
         local element = elements[n]
@@ -1359,15 +1342,6 @@ function layouts()
     lo = add_layout("tog_info")
     lo.geometry = {x = osc_geo.w - 68, y = btnY, an = 5, w = btnW, h = btnH}
     lo.style = osc_styles.button
-
-    -- Title
-    geo = { x = 20, y = refY - 92, an = 1, w = osc_geo.w - 48, h = 48 }
-    lo = add_layout("title")
-    lo.geometry = geo
-    lo.style = string.format("%s{\\clip(%f,%f,%f,%f)}", osc_styles.title,
-                                geo.x, geo.y - geo.h, geo.x + geo.w , geo.y)
-    lo.alpha[3] = 204
-    lo.button.maxchars = geo.w / 13
 end
 
 -- Validate string type user options
@@ -1661,26 +1635,10 @@ function osc_init()
     ne.eventresponder["mbtn_left_up"] =
         function () mp.commandv("script-binding", "stats/display-stats-toggle") end
 
-    -- title
-    ne = new_element("title", "button")
-    ne.content = function ()
-        local title = state.forced_title or
-                      mp.command_native({"expand-text", user_opts.title})
-        if state.paused then
-            -- escape ASS, and strip newlines and trailing slashes
-            title = title:gsub("\\n", " "):gsub("\\$", ""):gsub("{","\\{")
-        else
-            title = " "
-        end
-        return not (title == "") and title or "mpv"
-    end
-    ne.visible = false
-
     --seekbar
     ne = new_element("seekbar", "slider")
 
     ne.enabled = not (mp.get_property("percent-pos") == nil)
-    state.slider_element = ne.enabled and ne or nil  -- used for forced_title
     ne.thumbnail = true
     ne.slider.markerF = function ()
         local duration = mp.get_property_number("duration", nil)
