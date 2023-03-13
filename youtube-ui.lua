@@ -808,28 +808,26 @@ function render_elements(master_ass)
                         if osd_w then
                             local r_w, r_h = get_virt_scale_factor()
 
-                            local thumbPad = user_opts.thumbpad
-                            local thumbMarginX = 18 / r_w
-                            local thumbMarginY = 30
-                            local tooltipBgColor = "FFFFFF"
-                            local tooltipBgAlpha = 80
-                            local thumbX = math.min(osd_w - thumbfast.width - thumbMarginX, math.max(thumbMarginX, tx / r_w - thumbfast.width / 2))
-                            local thumbY = ((ty - thumbMarginY) / r_h - thumbfast.height)
+                            local thumb_pad = user_opts.thumbpad
+                            local thumb_margin_x = 16 / r_w + thumb_pad
+                            local thumb_margin_y = 24 / r_h + thumb_pad
+                            local thumb_x = math.min(osd_w - thumbfast.width - thumb_margin_x, math.max(thumb_margin_x, tx / r_w - thumbfast.width / 2))
+                            local thumb_y = ty / r_h - thumbfast.height - thumb_margin_y
 
-                            thumbX = math.floor(thumbX + 0.5)
-                            thumbY = math.floor(thumbY + 0.5)
+                            thumb_x = math.floor(thumb_x + 0.5)
+                            thumb_y = math.floor(thumb_y + 0.5)
 
                             elem_ass:new_event()
-                            elem_ass:pos(thumbX * r_w, ty - thumbMarginY - thumbfast.height * r_h)
-                            elem_ass:append(osc_styles.Tooltip)
+                            elem_ass:pos(thumb_x * r_w, thumb_y * r_h)
+                            elem_ass:append(slider_lo.tooltip_style)
                             elem_ass:draw_start()
-                            elem_ass:rect_cw(-thumbPad * r_w, -thumbPad * r_h, (thumbfast.width + thumbPad) * r_w, (thumbfast.height + thumbPad) * r_h)
+                            elem_ass:rect_cw(-thumb_pad * r_w, -thumb_pad * r_h, (thumbfast.width + thumb_pad) * r_w, (thumbfast.height + thumb_pad) * r_h)
                             elem_ass:draw_stop()
 
                             mp.commandv("script-message-to", "thumbfast", "thumb",
                                 mp.get_property_number("duration", 0) * (sliderpos / 100),
-                                thumbX,
-                                thumbY
+                                thumb_x,
+                                thumb_y
                             )
                         end
                     end
