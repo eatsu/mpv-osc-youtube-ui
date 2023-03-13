@@ -642,6 +642,9 @@ function render_elements(master_ass)
     for n=1, #elements do
         local element = elements[n]
 
+        -- false if other element is active
+        local activatable = (state.active_element == nil) or (state.active_element == n)
+
         local style_ass = assdraw.ass_new()
         style_ass:merge(element.style_ass)
         ass_append_alpha(style_ass, element.layout.alpha, 0)
@@ -744,7 +747,7 @@ function render_elements(master_ass)
             end
 
             if element.enabled and not (slider_lo.adjust_tooltip) then
-                if mouse_hit(element) then
+                if mouse_hit(element) and activatable then
                     element.layout.alpha[1] = 0
                 else
                     element.layout.alpha[1] = 51
@@ -756,7 +759,7 @@ function render_elements(master_ass)
             -- add tooltip
             if not (element.slider.tooltipF == nil) and element.enabled then
 
-                if mouse_hit(element) then
+                if mouse_hit(element) and activatable then
                     local sliderpos = get_slider_value(element)
                     local tooltiplabel = element.slider.tooltipF(sliderpos)
 
@@ -863,7 +866,7 @@ function render_elements(master_ass)
             end
 
             if element.enabled then
-                if mouse_hit(element) then
+                if mouse_hit(element) and activatable then
                     element.layout.alpha[1] = 0
                 else
                     element.layout.alpha[1] = 51
@@ -874,7 +877,7 @@ function render_elements(master_ass)
 
             -- add tooltip
             if not (element.tooltipF == nil) and element.enabled then
-                if mouse_hit(element) then
+                if mouse_hit(element) and activatable then
                     local tooltiplabel = element.tooltipF
                     local an = 2
                     local ty = element.hitbox.y1 + 12
