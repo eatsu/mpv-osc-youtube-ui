@@ -791,7 +791,7 @@ function render_elements(master_ass)
                     else
                         -- for volumebar
                         tx = element.hitbox.x1 + elem_geo.w / 2
-                        ty = ty + 12
+                        ty = element.hitbox.y1 - 20
                     end
 
                     -- tooltip label
@@ -878,7 +878,7 @@ function render_elements(master_ass)
                 if mouse_hit(element) and activatable then
                     local tooltiplabel = element.tooltipF
                     local an = 2
-                    local ty = element.hitbox.y1 + 12
+                    local ty = element.hitbox.y1 - 20
                     local tx = (element.hitbox.x1 + element.hitbox.x2) / 2
 
                     if ty < osc_param.playresy / 2 then
