@@ -38,6 +38,8 @@ local user_opts = {
     windowcontrols = "auto",    -- whether to show window controls
     windowcontrols_alignment = "right", -- which side to show window controls on
     livemarkers = true,         -- update seekbar chapter markers on duration change
+    chapters_osd = false,       -- whether to show chapters OSD on seekbar
+    playlist_osd = false,       -- whether to show playlist OSD on next/prev
     unicodeminus = false,       -- whether to use the Unicode minus sign character
     language = "eng",           -- eng=English, chs=Chinese
     thumbpad = 4,               -- thumbnail border size
@@ -1428,6 +1430,9 @@ function osc_init()
     ne.eventresponder["mbtn_left_up"] =
         function ()
             mp.commandv("playlist-prev", "weak")
+            if user_opts.playlist_osd then
+                show_message(get_playlist(), 3)
+            end
         end
     ne.eventresponder["shift+mbtn_left_up"] =
         function () show_message(get_playlist(), 3) end
@@ -1444,6 +1449,9 @@ function osc_init()
     ne.eventresponder["mbtn_left_up"] =
         function ()
             mp.commandv("playlist-next", "weak")
+            if user_opts.playlist_osd then
+                show_message(get_playlist(), 3)
+            end
         end
     ne.eventresponder["shift+mbtn_left_up"] =
         function () show_message(get_playlist(), 3) end
@@ -1746,6 +1754,9 @@ function osc_init()
                         end
                     end
                     mp.commandv("set", "chapter", ch - 1)
+                    if user_opts.chapters_osd then
+                        show_message(get_chapterlist(), 3)
+                    end
                 end
             end
         end
