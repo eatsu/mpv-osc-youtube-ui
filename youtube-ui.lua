@@ -1451,7 +1451,7 @@ function osc_init()
         function () show_message(get_playlist(), 3) end
 
 
-    --play control buttons
+    -- play control buttons
 
     --playpause
     ne = new_element("playpause", "button")
@@ -1484,11 +1484,11 @@ function osc_init()
     ne.tooltip_style = osc_styles.tooltip
     ne.tooltipF = "Seek backward"
     ne.eventresponder["mbtn_left_down"] =
-        function () mp.commandv("seek", -5, "exact") end
+        function () mp.commandv("seek", -5, "relative", "exact") end
     ne.eventresponder["shift+mbtn_left_down"] =
         function () mp.commandv("frame-back-step") end
     ne.eventresponder["mbtn_right_down"] =
-        function () mp.commandv("seek", -60, "exact") end
+        function () mp.commandv("seek", -60, "relative", "exact") end
 
     --skipfrwd
     ne = new_element("skipfrwd", "button")
@@ -1498,17 +1498,18 @@ function osc_init()
     ne.tooltip_style = osc_styles.tooltip
     ne.tooltipF = "Seek forward"
     ne.eventresponder["mbtn_left_down"] =
-        function () mp.commandv("seek", 5, "exact") end
+        function () mp.commandv("seek", 5, "relative", "exact") end
     ne.eventresponder["shift+mbtn_left_down"] =
         function () mp.commandv("frame-step") end
     ne.eventresponder["mbtn_right_down"] =
-        function () mp.commandv("seek", 60, "exact") end
+        function () mp.commandv("seek", 60, "relative", "exact") end
 
     --
     update_tracklist()
 
     --cy_audio
     ne = new_element("cy_audio", "button")
+
     ne.enabled = (#tracks_osc.audio > 1)
     ne.visible = (osc_param.playresx >= 456)
     ne.content = icons.cy_audio
@@ -1539,6 +1540,7 @@ function osc_init()
 
     --cy_sub
     ne = new_element("cy_sub", "button")
+
     ne.enabled = (#tracks_osc.sub > 0)
     ne.visible = (osc_param.playresx >= 496)
     ne.content = icons.cy_sub
@@ -1569,6 +1571,7 @@ function osc_init()
 
     -- volume
     ne = new_element("volume", "button")
+
     ne.enabled = (#tracks_osc.audio > 0)
     ne.content = function ()
         local volume = mp.get_property_number("volume", 0)
@@ -1593,16 +1596,12 @@ function osc_init()
 
     ne.eventresponder["wheel_up_press"] =
         function ()
-            if state.mute then
-                mp.commandv("cycle", "mute")
-            end
+            mp.commandv("set", "mute", "no")
             mp.commandv("osd-msg", "add", "volume", 5)
         end
     ne.eventresponder["wheel_down_press"] =
         function ()
-            if state.mute then
-                mp.commandv("cycle", "mute")
-            end
+            mp.commandv("set", "mute", "no")
             mp.commandv("osd-msg", "add", "volume", -5)
         end
 
@@ -1759,15 +1758,14 @@ function osc_init()
 
     --volumebar
     ne = new_element("volumebar", "slider")
+
     ne.enabled = (#tracks_osc.audio > 0)
-    ne.slider.tooltipF =
-        function ()
-            return "Volume"
-        end
     ne.slider.markerF = nil
     ne.slider.seekRangesF = nil
     ne.slider.posF =
         function () return mp.get_property_number("volume", 0) end
+    ne.slider.tooltipF =
+        function () return "Volume" end
     ne.eventresponder["mouse_move"] = --volume seeking when mouse is dragged
         function (element)
             local seekto = get_slider_value(element)
@@ -1779,23 +1777,17 @@ function osc_init()
         end
     ne.eventresponder["mbtn_left_down"] = --exact seeks on single clicks
         function (element)
-            if state.mute then
-                mp.commandv("cycle", "mute")
-            end
+            mp.commandv("set", "mute", "no")
             mp.commandv("osd-msg", "set", "volume", get_slider_value(element))
         end
     ne.eventresponder["wheel_up_press"] =
         function ()
-            if state.mute then
-                mp.commandv("cycle", "mute")
-            end
+            mp.commandv("set", "mute", "no")
             mp.commandv("osd-msg", "add", "volume", 5)
         end
     ne.eventresponder["wheel_down_press"] =
         function ()
-            if state.mute then
-                mp.commandv("cycle", "mute")
-            end
+            mp.commandv("set", "mute", "no")
             mp.commandv("osd-msg", "add", "volume", -5)
         end
     ne.eventresponder["reset"] =
@@ -1841,6 +1833,7 @@ function osc_init()
         state.tc_ms = not state.tc_ms
         request_init()
     end
+
 
     -- load layout
     layouts()
