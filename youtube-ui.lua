@@ -1840,10 +1840,8 @@ function osc_init()
     end
     ne.eventresponder["mbtn_left_up"] =
         function () state.rightTC_trem = not state.rightTC_trem end
-    ne.eventresponder["mbtn_right_up"] = function ()
-        state.tc_ms = not state.tc_ms
-        request_init()
-    end
+    ne.eventresponder["mbtn_right_up"] =
+        function () state.tc_ms = not state.tc_ms end
 
 
     -- load layout
