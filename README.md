@@ -1,11 +1,12 @@
 # mpv-osc-youtube-ui
 
-This is an [mpv](https://mpv.io) OSC script based on
-[mpv-osc-modern](https://github.com/maoiscat/mpv-osc-modern) that provides a YouTube-like UI.
+An OSC script for [mpv](https://mpv.io) that provides a YouTube-like UI,
+forked from [mpv-osc-modern](https://github.com/maoiscat/mpv-osc-modern).
 
 ![preview](preview.png?raw=true)
+![preview-complex](preview-complex.png?raw=true)
 
-## Changes from mpv-osc-modern
+## Notable changes from mpv-osc-modern
 
 - YouTube-like UI
 - More compact layout
@@ -16,25 +17,24 @@ This is an [mpv](https://mpv.io) OSC script based on
 - Shorter duration for fade-in/out
 - No deadzone by default (OSC will show up anywhere in the window with mouse movement)
 - No window controls when full screen
-- Using built-in icons instead of the iconic font
+- Using built-in icons instead of the extra iconic font
 
 ## Installation
 
-1. Put `youtube-ui.lua` in your mpv `scripts` directory:
-
-```sh
-mkdir -p ~/.config/mpv/scripts
-wget -P ~/.config/mpv/scripts https://github.com/eatsu/mpv-osc-youtube-ui/raw/main/youtube-ui.lua
-```
-
-2. Add `osc=no` to your `mpv.conf` file:
+1. To disable the default OSC, add `osc=no` to your `mpv.conf` file:
 
 ```sh
 echo 'osc=no' >> ~/.config/mpv/mpv.conf
 ```
 
-3. (optional) Put `thumbfast.lua` from [thumbfast](https://github.com/po5/thumbfast) in your mpv
-`scripts` directory:
+2. Put `youtube-ui.lua` in your mpv `scripts` directory:
+
+```sh
+wget -P ~/.config/mpv/scripts https://github.com/eatsu/mpv-osc-youtube-ui/raw/main/youtube-ui.lua
+```
+
+3. (optional, but recommended) To show the thumbnail tooltip, put `thumbfast.lua` from
+[thumbfast](https://github.com/po5/thumbfast) in your mpv `scripts` directory:
 
 ```sh
 wget -P ~/.config/mpv/scripts https://github.com/po5/thumbfast/raw/master/thumbfast.lua
