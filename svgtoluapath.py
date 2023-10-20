@@ -3,6 +3,7 @@
 # Based on:
 # https://github.com/Zren/mpv-osc-tethys/blob/master/icons/svgtohtmltoluapath.py
 
+import argparse
 import re
 import subprocess
 import sys
@@ -132,7 +133,13 @@ def print_lua_path(name: str) -> None:
 
 
 def main() -> None:
-    icons = sys.argv[1:] if len(sys.argv) > 1 else ICONS
+    parser = argparse.ArgumentParser(description="Convert SVG to Lua path and print.")
+    parser.add_argument(
+        "icons", metavar="NAME", type=str, nargs="*", help="SVG icon name"
+    )
+    args = parser.parse_args()
+
+    icons = args.icons if args.icons else ICONS
 
     print("local icons = {")
 
