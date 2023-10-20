@@ -36,9 +36,6 @@ ICONS = [
     "volume_mute",
 ]
 
-if len(sys.argv) > 1:
-    ICONS = sys.argv[1:]
-
 N = r"(-?\d+(\.\d+)?)"  # int or float pattern
 F = r"(-?\d+\.\d+)"  # float pattern
 
@@ -134,9 +131,16 @@ def print_lua_path(name: str) -> None:
     html_file.unlink()
 
 
-print("local icons = {")
+def main() -> None:
+    icons = sys.argv[1:] if len(sys.argv) > 1 else ICONS
 
-for icon in ICONS:
-    print_lua_path(icon)
+    print("local icons = {")
 
-print("}")
+    for icon in icons:
+        print_lua_path(icon)
+
+    print("}")
+
+
+if __name__ == "__main__":
+    main()
