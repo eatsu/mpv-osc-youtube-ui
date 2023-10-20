@@ -39,11 +39,14 @@ icons = [
 if len(sys.argv) > 1:
     icons = sys.argv[1:]
 
-canvasSizePattern = re.compile(r"    \<canvas id='canvas' width='(-?\d+(\.\d+)?)' height='(-?\d+(\.\d+)?)'\>\<\/canvas\>")
+N = r"(-?\d+(\.\d+)?)"  # int or float pattern
+F = r"(-?\d+\.\d+)"  # float pattern
+
+canvasSizePattern = re.compile(rf"    <canvas id='canvas' width='{N}' height='{N}'></canvas>")
 transformPattern = re.compile(r"\tctx.transform\(.+")
-moveToPattern = re.compile(r"\tctx.moveTo\((-?\d+\.\d+), (-?\d+\.\d+)\);")
-lineToPattern = re.compile(r"\tctx.lineTo\((-?\d+\.\d+), (-?\d+\.\d+)\);")
-curveToPattern = re.compile(r"\tctx.bezierCurveTo\((-?\d+\.\d+), (-?\d+\.\d+), (-?\d+\.\d+), (-?\d+\.\d+), (-?\d+\.\d+), (-?\d+\.\d+)\);")
+moveToPattern = re.compile(rf"\tctx.moveTo\({F}, {F}\);")
+lineToPattern = re.compile(rf"\tctx.lineTo\({F}, {F}\);")
+curveToPattern = re.compile(rf"\tctx.bezierCurveTo\({F}, {F}, {F}, {F}, {F}, {F}\);")
 
 
 def convertToCanvas(svgFilepath: Path) -> Path:
