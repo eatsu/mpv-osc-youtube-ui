@@ -5,8 +5,8 @@
 
 import re
 import subprocess
-import os
 import sys
+from pathlib import Path
 
 icons = [
     "play",
@@ -47,7 +47,7 @@ curveToPattern = re.compile(r"\tctx.bezierCurveTo\((-?\d+\.\d+), (-?\d+\.\d+), (
 
 
 def convertToCanvas(svgFilepath):
-    htmlFilepath = svgFilepath.replace(".svg", ".html")
+    htmlFilepath = svgFilepath.with_suffix(".html")
     subprocess.run(["inkscape", svgFilepath, "-o", htmlFilepath])
     return htmlFilepath
 
@@ -61,7 +61,7 @@ def cleanNum(numstr):
 
 def generatePath(filepath):
     path = []
-    with open(filepath, "r") as fin:
+    with filepath.open("r") as fin:
         for line in fin.readlines():
             line = line.rstrip()
             # print(line)
@@ -127,13 +127,13 @@ def printIcon(name, htmlFilepath):
 
 
 def genIconPath(name):
-    svgFilepath = os.path.join("icons", f"{name}.svg")
-    if not os.path.exists(svgFilepath):
+    svgFilepath = Path("icons", f"{name}.svg")
+    if not svgFilepath.exists():
         print(f"Error: File '{svgFilepath}' does not exist.")
         sys.exit(1)
     htmlFilepath = convertToCanvas(svgFilepath)
     printIcon(name, htmlFilepath)
-    os.remove(htmlFilepath)
+    htmlFilepath.unlink()
 
 
 print("local icons = {")
