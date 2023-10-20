@@ -46,20 +46,20 @@ lineToPattern = re.compile(r"\tctx.lineTo\((-?\d+\.\d+), (-?\d+\.\d+)\);")
 curveToPattern = re.compile(r"\tctx.bezierCurveTo\((-?\d+\.\d+), (-?\d+\.\d+), (-?\d+\.\d+), (-?\d+\.\d+), (-?\d+\.\d+), (-?\d+\.\d+)\);")
 
 
-def convertToCanvas(svgFilepath):
+def convertToCanvas(svgFilepath: Path) -> Path:
     htmlFilepath = svgFilepath.with_suffix(".html")
     subprocess.run(["inkscape", svgFilepath, "-o", htmlFilepath])
     return htmlFilepath
 
 
-def cleanNum(numstr):
+def cleanNum(numstr: str) -> str:
     outstr = str(float(numstr))
     if outstr.endswith(".0"):
         outstr = outstr[:-2]
     return outstr
 
 
-def generatePath(filepath):
+def generatePath(filepath: Path) -> str:
     path = []
     with filepath.open("r") as fin:
         for line in fin.readlines():
@@ -118,15 +118,15 @@ def generatePath(filepath):
                 path.append(cmd)
                 continue
 
-    return " ".join(path)
+    return str(" ".join(path))
 
 
-def printIcon(name, htmlFilepath):
+def printIcon(name: str, htmlFilepath: Path) -> None:
     path = generatePath(htmlFilepath)
     print(rf'    {name} = "{{\\p1}}{path}{{\\p0}}",')
 
 
-def genIconPath(name):
+def genIconPath(name: str) -> None:
     svgFilepath = Path("icons", f"{name}.svg")
     if not svgFilepath.exists():
         print(f"Error: File '{svgFilepath}' does not exist.")
