@@ -72,11 +72,11 @@ def generatePath(filepath):
                 # MPV's ASS alignment centering crops the path itself.
                 # For the path to retain position in the SVG viewbox,
                 # we need to "move" to the corners of the viewbox.
-                cmd = "m 0 0" # Top Left
+                cmd = "m 0 0"  # Top Left
                 path.append(cmd)
                 w = cleanNum(m.group(1))
                 h = cleanNum(m.group(3))
-                cmd = "m {} {}".format(w, h) # Bottom Right
+                cmd = f"m {w} {h}"  # Bottom Right
                 # print("size", cmd)
                 path.append(cmd)
                 continue
@@ -90,7 +90,7 @@ def generatePath(filepath):
             if m:
                 x = cleanNum(m.group(1))
                 y = cleanNum(m.group(2))
-                cmd = "m {} {}".format(x, y)
+                cmd = f"m {x} {y}"
                 # print("moveTo", cmd)
                 path.append(cmd)
                 continue
@@ -98,7 +98,7 @@ def generatePath(filepath):
             if m:
                 x = cleanNum(m.group(1))
                 y = cleanNum(m.group(2))
-                cmd = "l {} {}".format(x, y)
+                cmd = f"l {x} {y}"
                 # print("lineTo", cmd)
                 path.append(cmd)
                 continue
@@ -110,7 +110,7 @@ def generatePath(filepath):
                 y2 = cleanNum(m.group(4))
                 x = cleanNum(m.group(5))
                 y = cleanNum(m.group(6))
-                cmd = "b {} {} {} {} {} {}".format(x1, y1, x2, y2, x, y)
+                cmd = f"b {x1} {y1} {x2} {y2} {x} {y}"
                 # print("curveTo", cmd)
                 path.append(cmd)
                 continue
@@ -118,10 +118,10 @@ def generatePath(filepath):
 
 def printIcon(name, htmlFilepath):
     path = generatePath(htmlFilepath)
-    print(r"    " + name + r' = "{\\p1}' + path + r'{\\p0}",')
+    print(rf'    {name} = "{{\\p1}}{path}{{\\p0}}",')
 
 def genIconPath(name):
-    svgFilepath = os.path.join("icons", name + ".svg")
+    svgFilepath = os.path.join("icons", f"{name}.svg")
     if not os.path.exists(svgFilepath):
         print(f"Error: File '{svgFilepath}' does not exist.")
         sys.exit(1)
