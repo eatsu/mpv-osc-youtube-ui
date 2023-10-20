@@ -8,7 +8,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-icons = [
+ICONS = [
     "play",
     "pause",
     "close",
@@ -37,111 +37,111 @@ icons = [
 ]
 
 if len(sys.argv) > 1:
-    icons = sys.argv[1:]
+    ICONS = sys.argv[1:]
 
 N = r"(-?\d+(\.\d+)?)"  # int or float pattern
 F = r"(-?\d+\.\d+)"  # float pattern
 
-canvasSizePattern = re.compile(rf"    <canvas id='canvas' width='{N}' height='{N}'></canvas>")
-transformPattern = re.compile(r"\tctx.transform\(.+")
-moveToPattern = re.compile(rf"\tctx.moveTo\({F}, {F}\);")
-lineToPattern = re.compile(rf"\tctx.lineTo\({F}, {F}\);")
-curveToPattern = re.compile(rf"\tctx.bezierCurveTo\({F}, {F}, {F}, {F}, {F}, {F}\);")
+CANVAS = re.compile(rf"    <canvas id='canvas' width='{N}' height='{N}'></canvas>")
+TRANSFORM = re.compile(r"\tctx.transform\(.+")
+MOVE_TO = re.compile(rf"\tctx.moveTo\({F}, {F}\);")
+LINE_TO = re.compile(rf"\tctx.lineTo\({F}, {F}\);")
+BEZIER_CURVE_TO = re.compile(rf"\tctx.bezierCurveTo\({F}, {F}, {F}, {F}, {F}, {F}\);")
 
 
-def convertToCanvas(svgFilepath: Path) -> Path:
-    htmlFilepath = svgFilepath.with_suffix(".html")
-    subprocess.run(["inkscape", svgFilepath, "-o", htmlFilepath])
-    return htmlFilepath
+def convert_to_html_file(svg_file: Path) -> Path:
+    html_file = svg_file.with_suffix(".html")
+    subprocess.run(["inkscape", svg_file, "-o", html_file])
+    return html_file
 
 
-def cleanNum(numstr: str) -> str:
-    outstr = str(float(numstr))
+def clean_num(num: str) -> str:
+    outstr = str(float(num))
     if outstr.endswith(".0"):
         outstr = outstr[:-2]
     return outstr
 
 
-def generatePath(filepath: Path) -> str:
+def generate_lua_path(html_file: Path) -> str:
     path = []
-    with filepath.open("r") as fin:
-        for line in fin.readlines():
+    with html_file.open("r") as f:
+        for line in f.readlines():
             line = line.rstrip()
             # print(line)
 
-            m = canvasSizePattern.match(line)
+            m = CANVAS.match(line)
             if m:
                 # MPV's ASS alignment centering crops the path itself.
                 # For the path to retain position in the SVG viewbox,
                 # we need to "move" to the corners of the viewbox.
                 cmd = "m 0 0"  # Top Left
                 path.append(cmd)
-                w = cleanNum(m.group(1))
-                h = cleanNum(m.group(3))
-                cmd = f"m {w} {h}"  # Bottom Right
+                width = clean_num(m.group(1))
+                height = clean_num(m.group(3))
+                cmd = f"m {width} {height}"  # Bottom Right
                 # print("size", cmd)
                 path.append(cmd)
                 continue
 
-            m = transformPattern.match(line)
+            m = TRANSFORM.match(line)
             if m:
-                print("[error] filepath:", filepath)
+                print("[error] filepath:", html_file)
                 print("Cannot parse ctx.transform()")
                 print("Please ungroup path to remove transormation")
                 sys.exit(1)
 
-            m = moveToPattern.match(line)
+            m = MOVE_TO.match(line)
             if m:
-                x = cleanNum(m.group(1))
-                y = cleanNum(m.group(2))
+                x = clean_num(m.group(1))
+                y = clean_num(m.group(2))
                 cmd = f"m {x} {y}"
                 # print("moveTo", cmd)
                 path.append(cmd)
                 continue
 
-            m = lineToPattern.match(line)
+            m = LINE_TO.match(line)
             if m:
-                x = cleanNum(m.group(1))
-                y = cleanNum(m.group(2))
+                x = clean_num(m.group(1))
+                y = clean_num(m.group(2))
                 cmd = f"l {x} {y}"
                 # print("lineTo", cmd)
                 path.append(cmd)
                 continue
 
-            m = curveToPattern.match(line)
+            m = BEZIER_CURVE_TO.match(line)
             if m:
-                x1 = cleanNum(m.group(1))
-                y1 = cleanNum(m.group(2))
-                x2 = cleanNum(m.group(3))
-                y2 = cleanNum(m.group(4))
-                x = cleanNum(m.group(5))
-                y = cleanNum(m.group(6))
-                cmd = f"b {x1} {y1} {x2} {y2} {x} {y}"
-                # print("curveTo", cmd)
+                cp1x = clean_num(m.group(1))
+                cp1y = clean_num(m.group(2))
+                cp2x = clean_num(m.group(3))
+                cp2y = clean_num(m.group(4))
+                x = clean_num(m.group(5))
+                y = clean_num(m.group(6))
+                cmd = f"b {cp1x} {cp1y} {cp2x} {cp2y} {x} {y}"
+                # print("bezierCurveTo", cmd)
                 path.append(cmd)
                 continue
 
     return str(" ".join(path))
 
 
-def printIcon(name: str, htmlFilepath: Path) -> None:
-    path = generatePath(htmlFilepath)
-    print(rf'    {name} = "{{\\p1}}{path}{{\\p0}}",')
+def print_icon(name: str, html_file: Path) -> None:
+    lua_path = generate_lua_path(html_file)
+    print(rf'    {name} = "{{\\p1}}{lua_path}{{\\p0}}",')
 
 
-def genIconPath(name: str) -> None:
-    svgFilepath = Path("icons", f"{name}.svg")
-    if not svgFilepath.exists():
-        print(f"Error: File '{svgFilepath}' does not exist.")
+def print_lua_path(name: str) -> None:
+    svg_file = Path("icons", f"{name}.svg")
+    if not svg_file.exists():
+        print(f"Error: File '{svg_file}' does not exist.")
         sys.exit(1)
-    htmlFilepath = convertToCanvas(svgFilepath)
-    printIcon(name, htmlFilepath)
-    htmlFilepath.unlink()
+    html_file = convert_to_html_file(svg_file)
+    print_icon(name, html_file)
+    html_file.unlink()
 
 
 print("local icons = {")
 
-for icon in icons:
-    genIconPath(icon)
+for icon in ICONS:
+    print_lua_path(icon)
 
 print("}")
