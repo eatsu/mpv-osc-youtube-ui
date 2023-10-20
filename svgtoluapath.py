@@ -15,15 +15,15 @@ N = r"(-?\d+(\.\d+)?)"  # int or float pattern
 F = r"(-?\d+\.\d+)"  # float pattern
 
 CANVAS = re.compile(rf"    <canvas id='canvas' width='{N}' height='{N}'></canvas>")
-TRANSFORM = re.compile(r"\tctx.transform\(.+")
-MOVE_TO = re.compile(rf"\tctx.moveTo\({F}, {F}\);")
-LINE_TO = re.compile(rf"\tctx.lineTo\({F}, {F}\);")
-BEZIER_CURVE_TO = re.compile(rf"\tctx.bezierCurveTo\({F}, {F}, {F}, {F}, {F}, {F}\);")
+TRANSFORM = re.compile(r"\tctx\.transform\(.+")
+MOVE_TO = re.compile(rf"\tctx\.moveTo\({F}, {F}\);")
+LINE_TO = re.compile(rf"\tctx\.lineTo\({F}, {F}\);")
+BEZIER_CURVE_TO = re.compile(rf"\tctx\.bezierCurveTo\({F}, {F}, {F}, {F}, {F}, {F}\);")
 
 
 def convert_to_html_file(svg_file: Path) -> Path:
     html_file = svg_file.with_suffix(".html")
-    subprocess.run(["inkscape", svg_file, "-o", html_file])
+    subprocess.run(["inkscape", svg_file, "-o", html_file], check=True)
     return html_file
 
 
