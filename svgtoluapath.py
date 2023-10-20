@@ -121,18 +121,16 @@ def generate_lua_path(html_file: Path) -> str:
     return str(" ".join(path))
 
 
-def print_icon(name: str, html_file: Path) -> None:
-    lua_path = generate_lua_path(html_file)
-    print(rf'    {name} = "{{\\p1}}{lua_path}{{\\p0}}",')
-
-
 def print_lua_path(name: str) -> None:
     svg_file = Path("icons", f"{name}.svg")
+
     if not svg_file.exists():
         print(f"Error: File '{svg_file}' does not exist.")
         sys.exit(1)
+
     html_file = convert_to_html_file(svg_file)
-    print_icon(name, html_file)
+    lua_path = generate_lua_path(html_file)
+    print(rf'    {name} = "{{\\p1}}{lua_path}{{\\p0}}",')
     html_file.unlink()
 
 
