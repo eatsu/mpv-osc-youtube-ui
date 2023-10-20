@@ -56,10 +56,7 @@ def convert_to_html_file(svg_file: Path) -> Path:
 
 
 def clean_num(num: str) -> str:
-    outstr = str(float(num))
-    if outstr.endswith(".0"):
-        outstr = outstr[:-2]
-    return outstr
+    return num.rstrip("0").rstrip(".")
 
 
 def generate_lua_path(html_file: Path) -> str:
