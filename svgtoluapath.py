@@ -45,15 +45,12 @@ moveToPattern = re.compile(r"\tctx.moveTo\((-?\d+\.\d+), (-?\d+\.\d+)\);")
 lineToPattern = re.compile(r"\tctx.lineTo\((-?\d+\.\d+), (-?\d+\.\d+)\);")
 curveToPattern = re.compile(r"\tctx.bezierCurveTo\((-?\d+\.\d+), (-?\d+\.\d+), (-?\d+\.\d+), (-?\d+\.\d+), (-?\d+\.\d+), (-?\d+\.\d+)\);")
 
+
 def convertToCanvas(svgFilepath):
     htmlFilepath = svgFilepath.replace(".svg", ".html")
-    subprocess.run([
-        "inkscape",
-        svgFilepath,
-        "-o",
-        htmlFilepath,
-    ])
+    subprocess.run(["inkscape", svgFilepath, "-o", htmlFilepath])
     return htmlFilepath
+
 
 def cleanNum(numstr):
     outstr = str(float(numstr))
@@ -61,12 +58,14 @@ def cleanNum(numstr):
         outstr = outstr[:-2]
     return outstr
 
+
 def generatePath(filepath):
     path = []
     with open(filepath, "r") as fin:
         for line in fin.readlines():
             line = line.rstrip()
             # print(line)
+
             m = canvasSizePattern.match(line)
             if m:
                 # MPV's ASS alignment centering crops the path itself.
@@ -80,12 +79,14 @@ def generatePath(filepath):
                 # print("size", cmd)
                 path.append(cmd)
                 continue
+
             m = transformPattern.match(line)
             if m:
                 print("[error] filepath:", filepath)
                 print("Cannot parse ctx.transform()")
                 print("Please ungroup path to remove transormation")
                 sys.exit(1)
+
             m = moveToPattern.match(line)
             if m:
                 x = cleanNum(m.group(1))
@@ -94,6 +95,7 @@ def generatePath(filepath):
                 # print("moveTo", cmd)
                 path.append(cmd)
                 continue
+
             m = lineToPattern.match(line)
             if m:
                 x = cleanNum(m.group(1))
@@ -102,6 +104,7 @@ def generatePath(filepath):
                 # print("lineTo", cmd)
                 path.append(cmd)
                 continue
+
             m = curveToPattern.match(line)
             if m:
                 x1 = cleanNum(m.group(1))
@@ -114,11 +117,14 @@ def generatePath(filepath):
                 # print("curveTo", cmd)
                 path.append(cmd)
                 continue
+
     return " ".join(path)
+
 
 def printIcon(name, htmlFilepath):
     path = generatePath(htmlFilepath)
     print(rf'    {name} = "{{\\p1}}{path}{{\\p0}}",')
+
 
 def genIconPath(name):
     svgFilepath = os.path.join("icons", f"{name}.svg")
@@ -128,6 +134,7 @@ def genIconPath(name):
     htmlFilepath = convertToCanvas(svgFilepath)
     printIcon(name, htmlFilepath)
     os.remove(htmlFilepath)
+
 
 print("local icons = {")
 
