@@ -9,33 +9,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-ICONS = [
-    "play",
-    "pause",
-    "close",
-    "minimize",
-    "maximize",
-    "maximize_exit",
-    "fs_enter",
-    "fs_exit",
-    # "ch_prev",
-    # "ch_next",
-    "info",
-    "cy_audio",
-    "cy_sub",
-    # "pip_enter",
-    # "pip_exit",
-    "pl_prev",
-    "pl_next",
-    "skipback",
-    "skipfrwd",
-    # "speed",
-    "volume_low",
-    "volume_medium",
-    "volume_high",
-    "volume_over",
-    "volume_mute",
-]
+ICONS_DIR = Path("icons")
 
 N = r"(-?\d+(\.\d+)?)"  # int or float pattern
 F = r"(-?\d+\.\d+)"  # float pattern
@@ -119,13 +93,12 @@ def generate_lua_path(html_file: Path) -> str:
     return str(" ".join(path))
 
 
-def print_lua_path(name: str) -> None:
-    svg_file = Path("icons", f"{name}.svg")
-
+def print_lua_path(svg_file: Path) -> None:
     if not svg_file.exists():
         print(f"Error: File '{svg_file}' does not exist.")
         sys.exit(1)
 
+    name = svg_file.stem
     html_file = convert_to_html_file(svg_file)
     lua_path = generate_lua_path(html_file)
     print(rf'    {name} = "{{\\p1}}{lua_path}{{\\p0}}",')
@@ -135,16 +108,16 @@ def print_lua_path(name: str) -> None:
 def main() -> None:
     parser = argparse.ArgumentParser(description="Convert SVG to Lua path and print.")
     parser.add_argument(
-        "icons", metavar="NAME", type=str, nargs="*", help="SVG icon name"
+        "svg_files", metavar="SVG_FILE", type=Path, nargs="*", help="SVG icon file"
     )
     args = parser.parse_args()
 
-    icons = args.icons if args.icons else ICONS
+    svg_files = args.svg_files if args.svg_files else sorted(ICONS_DIR.glob("*.svg"))
 
     print("local icons = {")
 
-    for icon in icons:
-        print_lua_path(icon)
+    for svg_file in svg_files:
+        print_lua_path(svg_file)
 
     print("}")
 
