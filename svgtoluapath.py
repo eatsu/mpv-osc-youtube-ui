@@ -11,7 +11,7 @@ from pathlib import Path
 
 ICONS_DIR = Path("icons")
 
-N = r"(-?\d+(\.\d+)?)"  # int or float pattern
+N = r"(-?\d+\.?\d*)"  # int or float pattern
 F = r"(-?\d+\.\d+)"  # float pattern
 
 CANVAS = re.compile(rf"    <canvas id='canvas' width='{N}' height='{N}'></canvas>")
@@ -46,7 +46,7 @@ def generate_lua_path(html_file: Path) -> str:
                 cmd = "m 0 0"  # Top Left
                 path.append(cmd)
                 width = clean_num(m.group(1))
-                height = clean_num(m.group(3))
+                height = clean_num(m.group(2))
                 cmd = f"m {width} {height}"  # Bottom Right
                 # print("size", cmd)
                 path.append(cmd)
