@@ -44,5 +44,5 @@ wget -P ~/.config/mpv/scripts https://github.com/po5/thumbfast/raw/master/thumbf
 
 - The main script is based on [mpv-osc-modern](https://github.com/maoiscat/mpv-osc-modern) and
   mpv's [`osc.lua`](https://github.com/mpv-player/mpv/blob/master/player/lua/osc.lua).
-- `svgtohtmltoluapath.py` is based on [mpv-osc-tethys](https://github.com/Zren/mpv-osc-tethys).
+- `svgtoluapath.py` is based on [mpv-osc-tethys](https://github.com/Zren/mpv-osc-tethys).
 - Icons are based on [material-design-icons](https://github.com/google/material-design-icons).
