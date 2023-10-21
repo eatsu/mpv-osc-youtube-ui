@@ -54,8 +54,7 @@ def generate_lua_path(html_file: Path) -> str:
 
             m = TRANSFORM.match(line)
             if m:
-                print("[error] filepath:", html_file)
-                print("Cannot parse ctx.transform()")
+                print(f"Error: Cannot parse ctx.transform(): '{html_file}'")
                 print("Please ungroup path to remove transormation")
                 sys.exit(1)
 
@@ -94,8 +93,8 @@ def generate_lua_path(html_file: Path) -> str:
 
 
 def print_lua_path(svg_file: Path) -> None:
-    if not svg_file.exists():
-        print(f"Error: File '{svg_file}' does not exist.")
+    if not svg_file.is_file():
+        print(f"Error: No such file: '{svg_file}'")
         sys.exit(1)
 
     name = svg_file.stem
