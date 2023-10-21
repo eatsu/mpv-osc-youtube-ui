@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 
-# Based on:
-# https://github.com/Zren/mpv-osc-tethys/blob/master/icons/svgtohtmltoluapath.py
+"""Convert SVG to HTML canvas to Lua path, then format and print it.
+
+This script is forked from:
+https://github.com/Zren/mpv-osc-tethys/blob/master/icons/svgtohtmltoluapath.py
+"""
 
 import argparse
 import re
@@ -31,7 +34,7 @@ def clean_num(num: str) -> str:
     return num.rstrip("0").rstrip(".")
 
 
-def generate_lua_path(html_file: Path) -> str:
+def convert_to_lua_path(html_file: Path) -> str:
     paths = []
     with html_file.open("r") as f:
         for line in f:
@@ -81,7 +84,7 @@ def print_lua_path(svg_file: Path) -> None:
 
     name = svg_file.stem
     html_file = convert_to_html_file(svg_file)
-    lua_path = generate_lua_path(html_file)
+    lua_path = convert_to_lua_path(html_file)
     print(rf'    {name} = "{{\\p1}}{lua_path}{{\\p0}}",')
     html_file.unlink()
 
