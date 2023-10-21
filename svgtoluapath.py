@@ -32,11 +32,11 @@ def clean_num(num: str) -> str:
 
 
 def generate_lua_path(html_file: Path) -> str:
-    path = []
+    paths = []
     with html_file.open("r") as f:
         for line in f:
             line = line.strip()
-            cmd = None
+            path = None
 
             m = CANVAS.match(line)
             if m:
@@ -44,7 +44,7 @@ def generate_lua_path(html_file: Path) -> str:
                 # For the path to retain position in the SVG viewbox,
                 # we need to "move" to the corners of the viewbox.
                 width, height = [clean_num(n) for n in m.groups()]
-                cmd = f"m 0 0 m {width} {height}"  # Top Left Bottom Right
+                path = f"m 0 0 m {width} {height}"  # Top Left Bottom Right
 
             m = TRANSFORM.match(line)
             if m:
@@ -55,22 +55,22 @@ def generate_lua_path(html_file: Path) -> str:
             m = MOVE_TO.match(line)
             if m:
                 x, y = [clean_num(n) for n in m.groups()]
-                cmd = f"m {x} {y}"
+                path = f"m {x} {y}"
 
             m = LINE_TO.match(line)
             if m:
                 x, y = [clean_num(n) for n in m.groups()]
-                cmd = f"l {x} {y}"
+                path = f"l {x} {y}"
 
             m = BEZIER_CURVE_TO.match(line)
             if m:
                 cp1x, cp1y, cp2x, cp2y, x, y = [clean_num(n) for n in m.groups()]
-                cmd = f"b {cp1x} {cp1y} {cp2x} {cp2y} {x} {y}"
+                path = f"b {cp1x} {cp1y} {cp2x} {cp2y} {x} {y}"
 
-            if cmd:
-                path.append(cmd)
+            if path:
+                paths.append(path)
 
-    lua_path = str(" ".join(path))
+    lua_path = str(" ".join(paths))
     return lua_path
 
 
