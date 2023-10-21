@@ -14,11 +14,11 @@ ICONS_DIR = Path("icons")
 N = r"(-?\d+\.?\d*)"  # int or float pattern
 F = r"(-?\d+\.\d+)"  # float pattern
 
-CANVAS = re.compile(rf"    <canvas id='canvas' width='{N}' height='{N}'></canvas>")
-TRANSFORM = re.compile(r"\tctx\.transform\(.+")
-MOVE_TO = re.compile(rf"\tctx\.moveTo\({F}, {F}\);")
-LINE_TO = re.compile(rf"\tctx\.lineTo\({F}, {F}\);")
-BEZIER_CURVE_TO = re.compile(rf"\tctx\.bezierCurveTo\({F}, {F}, {F}, {F}, {F}, {F}\);")
+CANVAS = re.compile(rf"<canvas id='canvas' width='{N}' height='{N}'></canvas>")
+TRANSFORM = re.compile(r"ctx\.transform\(.+")
+MOVE_TO = re.compile(rf"ctx\.moveTo\({F}, {F}\);")
+LINE_TO = re.compile(rf"ctx\.lineTo\({F}, {F}\);")
+BEZIER_CURVE_TO = re.compile(rf"ctx\.bezierCurveTo\({F}, {F}, {F}, {F}, {F}, {F}\);")
 
 
 def convert_to_html_file(svg_file: Path) -> Path:
@@ -34,23 +34,17 @@ def clean_num(num: str) -> str:
 def generate_lua_path(html_file: Path) -> str:
     path = []
     with html_file.open("r") as f:
-        for line in f.readlines():
-            line = line.rstrip()
-            # print(line)
+        for line in f:
+            line = line.strip()
+            cmd = None
 
             m = CANVAS.match(line)
             if m:
                 # MPV's ASS alignment centering crops the path itself.
                 # For the path to retain position in the SVG viewbox,
                 # we need to "move" to the corners of the viewbox.
-                cmd = "m 0 0"  # Top Left
-                path.append(cmd)
-                width = clean_num(m.group(1))
-                height = clean_num(m.group(2))
-                cmd = f"m {width} {height}"  # Bottom Right
-                # print("size", cmd)
-                path.append(cmd)
-                continue
+                width, height = [clean_num(n) for n in m.groups()]
+                cmd = f"m 0 0 m {width} {height}"  # Top Left Bottom Right
 
             m = TRANSFORM.match(line)
             if m:
@@ -60,36 +54,24 @@ def generate_lua_path(html_file: Path) -> str:
 
             m = MOVE_TO.match(line)
             if m:
-                x = clean_num(m.group(1))
-                y = clean_num(m.group(2))
+                x, y = [clean_num(n) for n in m.groups()]
                 cmd = f"m {x} {y}"
-                # print("moveTo", cmd)
-                path.append(cmd)
-                continue
 
             m = LINE_TO.match(line)
             if m:
-                x = clean_num(m.group(1))
-                y = clean_num(m.group(2))
+                x, y = [clean_num(n) for n in m.groups()]
                 cmd = f"l {x} {y}"
-                # print("lineTo", cmd)
-                path.append(cmd)
-                continue
 
             m = BEZIER_CURVE_TO.match(line)
             if m:
-                cp1x = clean_num(m.group(1))
-                cp1y = clean_num(m.group(2))
-                cp2x = clean_num(m.group(3))
-                cp2y = clean_num(m.group(4))
-                x = clean_num(m.group(5))
-                y = clean_num(m.group(6))
+                cp1x, cp1y, cp2x, cp2y, x, y = [clean_num(n) for n in m.groups()]
                 cmd = f"b {cp1x} {cp1y} {cp2x} {cp2y} {x} {y}"
-                # print("bezierCurveTo", cmd)
-                path.append(cmd)
-                continue
 
-    return str(" ".join(path))
+            if cmd:
+                path.append(cmd)
+
+    lua_path = str(" ".join(path))
+    return lua_path
 
 
 def print_lua_path(svg_file: Path) -> None:
