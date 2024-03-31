@@ -32,6 +32,8 @@ local user_opts = {
     title = "${media-title}",   -- string compatible with property-expansion
                                 -- to be shown as OSC title
     timetotal = true,           -- display total time instead of remaining time?
+    remaining_playtime = true,  -- display the remaining time in playtime or video-time mode
+                                -- playtime takes speed into account, whereas video-time doesn't
     timems = false,             -- display timecodes with milliseconds?
     visibility = "auto",        -- only used at init to set visibility_mode(...)
     boxvideo = false,           -- apply osc_param.video_margins to video
@@ -1817,13 +1819,15 @@ function osc_init()
         end
         if (state.rightTC_trem) then
             local minus = user_opts.unicodeminus and UNICODE_MINUS or "-"
+            local property = user_opts.remaining_playtime and "playtime-remaining"
+                                                           or "time-remaining"
             if state.tc_ms then
                 return (mp.get_property_osd("playback-time/full") .. " / "
-                    .. minus .. mp.get_property_osd("playtime-remaining/full")
+                    .. minus .. mp.get_property_osd(property .. "/full")
                     .. chapter_title)
             else
                 return (mp.get_property_osd("playback-time") .. " / "
-                    .. minus .. mp.get_property_osd("playtime-remaining")
+                    .. minus .. mp.get_property_osd(property)
                     .. chapter_title)
             end
         else
