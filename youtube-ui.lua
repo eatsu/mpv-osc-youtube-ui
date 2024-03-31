@@ -192,7 +192,7 @@ function kill_animation()
     state.anitype =  nil
 end
 
-function set_osd(res_x, res_y, text)
+function set_osd(res_x, res_y, text, z)
     if state.osd.res_x == res_x and
        state.osd.res_y == res_y and
        state.osd.data == text then
@@ -201,7 +201,7 @@ function set_osd(res_x, res_y, text)
     state.osd.res_x = res_x
     state.osd.res_y = res_y
     state.osd.data = text
-    state.osd.z = 1000
+    state.osd.z = z
     state.osd:update()
 end
 
@@ -2191,7 +2191,7 @@ function render()
 
     -- submit
     set_osd(osc_param.playresy * osc_param.display_aspect,
-            osc_param.playresy, ass.text)
+            osc_param.playresy, ass.text, 1000)
 end
 
 --
@@ -2314,7 +2314,7 @@ function show_logo()
     ass:pos(logo_x, logo_y+110)
     ass:an(8)
     ass:append(texts.welcome)
-    set_osd(osd_w, osd_h, ass.text)
+    set_osd(osd_w, osd_h, ass.text, -1000)
 end
 
 -- called by mpv on every frame
